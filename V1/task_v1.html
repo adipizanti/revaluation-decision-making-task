@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reappraisal Task V1</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500;800&display=swap');
+        
+        body { 
+            background-color: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            user-select: none;
+            padding: 20px;
+        }
+
+        .modal-card { 
+            background: rgba(30, 41, 59, 0.98); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 32px; 
+            width: 900px; 
+            max-width: 95vw;
+            padding: 3.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            text-align: center; 
+            position: relative;
+            max-height: 95vh;
+            overflow-y: auto;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: white; 
+            padding: 18px 48px; 
+            border-radius: 16px;
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em;
+            display: inline-block;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.1s;
+            cursor: pointer;
+        }
+        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .action-btn:active { transform: translateY(0); }
+
+        .secondary-btn {
+            background: transparent;
+            color: #94a3b8;
+            padding: 18px 48px;
+            border-radius: 16px;
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            border: 2px solid #334155;
+            transition: all 0.2s;
+        }
+        .secondary-btn:hover { background: #1e293b; color: white; border-color: #475569; }
+
+        .key-cap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1);
+            color: #1e293b;
+            border-radius: 6px;
+            border-bottom: 3px solid #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.9em;
+            margin: 0 4px;
+        }
+
+        .option-card {
+            border: 3px solid #334155; 
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 24px; padding: 2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100%; width: 100%; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-card:hover { border-color: #6366f1; background: rgba(30, 41, 59, 0.8); transform: translateY(-4px); }
+
+        .hud-frame {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 99px;
+            padding: 10px 30px;
+            z-index: 40;
+            display: flex; gap: 15px; align-items: center;
+        }
+
+        input[type=range] { width: 100%; height: 12px; background: #334155; border-radius: 99px; appearance: none; outline: none; }
+        input[type=range]::-webkit-slider-thumb { 
+            appearance: none; width: 40px; height: 40px; background: #f8fafc; 
+            border-radius: 50%; cursor: pointer; border: 4px solid #6366f1; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        .timer-bar-bg { position: fixed; top: 0; left: 0; width: 100%; height: 6px; background: #1e293b; z-index: 50; }
+        .timer-bar-fill { height: 100%; background: #6366f1; width: 100%; transform-origin: left; }
+
+        .instruction-pill { 
+            background: rgba(99, 102, 241, 0.15); 
+            border: 1px solid rgba(99, 102, 241, 0.3); 
+            border-radius: 12px; padding: 0.75rem 2rem; 
+            color: #a5b4fc; font-weight: 700; letter-spacing: 0.05em;
+        }
+        
+        .state-container { 
+            width: 340px; height: 340px; 
+            transition: opacity 0.15s ease, transform 0.3s ease; 
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #reward-display {
+            position: fixed; top: 25%; left: 50%; transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace; font-size: 6rem; font-weight: 800;
+            z-index: 60; opacity: 0; pointer-events: none;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .reward-pos { color: #4ade80; }
+        .reward-neg { color: #ef4444; }
+
+        .likert-btn {
+            width: 50px; height: 50px; border-radius: 10px; background: #334155;
+            border: 1px solid #475569; color: #cbd5e1; font-weight: bold; transition: all 0.2s ease;
+        }
+        .likert-btn:hover { background: #4f46e5; color: white; }
+        .likert-btn.selected { background: #4f46e5; color: white; border-color: white; transform: scale(1.1); }
+
+        .reveal-card {
+            width: 200px; height: 200px;
+            border-radius: 32px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 4px solid;
+        }
+        .reveal-card:hover:not(.revealed) { transform: scale(1.05); filter: brightness(1.1); }
+        .reveal-card.revealed { cursor: default; }
+
+        .countdown-circle {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 6px solid #4f46e5;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; font-weight: 800;
+            color: white;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="timer-bar-bg"><div id="timer-fill" class="timer-bar-fill"></div></div>
+    <div id="reward-display"></div>
+
+    <div id="hud" class="hud-frame opacity-0 transition-opacity duration-500">
+        <div class="p-2 bg-indigo-500/20 border border-indigo-500/40 rounded-lg">
+            <i data-lucide="map-pin" class="w-5 h-5 text-indigo-300"></i>
+        </div>
+        <div class="text-left">
+            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Current Phase</div>
+            <div id="phase-label" class="text-sm font-black text-white uppercase tracking-wide">INIT</div>
+        </div>
+    </div>
+
+    <main id="game-stage" class="flex flex-col items-center justify-center relative">
+        <div id="instruction-wrapper" class="mb-10 h-12 flex justify-center items-center">
+            <div id="instruction-layer" class="instruction-pill text-xl opacity-0 transition-opacity"></div>
+        </div>
+        
+        <div id="state-anchor" class="state-container flex items-center justify-center relative">
+            <div id="icon-target"></div>
+        </div>
+        
+        <div id="terminal-action" class="mt-12 h-8"></div>
+    </main>
+
+    <div id="overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 transition-opacity duration-300 opacity-0 pointer-events-none overflow-hidden">
+        <div id="overlay-content" class="modal-card"></div>
+    </div>
+
+    <script>
+    // ============================================
+    // FIREBASE CONFIGURATION
+    // ============================================
+    // IMPORTANT: Replace these values with your project's configuration
+    const firebaseConfig = {
+       apiKey: "PASTE_YOUR_API_KEY_HERE",
+       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+       projectId: "YOUR_PROJECT_ID",
+       storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+       messagingSenderId: "YOUR_SENDER_ID",
+       appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.signInAnonymously()
+        .then(() => console.log("Signed in anonymously"))
+        .catch((error) => console.error("Auth failed:", error));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolificID = urlParams.get('PROLIFIC_PID');
+
+    // ============================================
+    // SEEDED RANDOM (for reproducible randomization)
+    // ============================================
+    function seededRandom(seed) {
+        let x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+    
+    function shuffleWithSeed(array, seed) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(seededRandom(seed + i) * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function stringToSeed(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash);
+    }
+
+    // ============================================
+    // GAME CONSTANTS
+    // ============================================
+    const ICONS = {
+        'S':   { icon: 'circle',     color: '#94a3b8', label: 'Circle' },
+        'M1L': { icon: 'feather',    color: '#f032e6', label: 'Feather' },
+        'M1R': { icon: 'triangle',   color: '#4363d8', label: 'Triangle' },
+        'T1':  { icon: 'square',     color: '#22c55e', label: 'Square' },
+        'T2':  { icon: 'lamp-floor', color: '#eab308', label: 'Lamp' },
+        'T3':  { icon: 'amphora',    color: '#f97316', label: 'Amphora'},
+        'T4':  { icon: 'cloud',      color: '#991b1b', label: 'Cloud' }
+    };
+
+    const TERMINAL_VALUES = {
+        initial: { T1: 0, T2: 0, T3: 0, T4: 0 },
+        afterReval1: { T1: -20, T2: -20, T3: +20, T4: +20 },
+        afterReval2: { T1: -20, T2: 0, T3: 0, T4: +20 }
+    };
+
+    const SURVEY_DATA = {
+        ERQ: {
+            title: "Questionnaire No.1",
+            instructions: "1 = Strongly Disagree, 4 = Neutral, 7 = Strongly Agree",
+            scale: 7,
+            items: [
+                "When I want to feel more positive emotion (such as joy or amusement), I change what I'm thinking about.",
+                "I keep my emotions to myself.",
+                "When I want to feel less negative emotion (such as sadness or anger), I change what I'm thinking about.",
+                "When I am feeling positive emotions, I am careful not to express them.",
+                "When I'm faced with a stressful situation, I make myself think about it in a way that helps me stay calm.",
+                "I control my emotions by not expressing them.",
+                "When I want to feel more positive emotion, I change the way I'm thinking about the situation.",
+                "I control my emotions by changing the way I think about the situation I'm in.",
+                "When I am feeling negative emotions, I make sure not to express them.",
+                "When I want to feel less negative emotion, I change the way I'm thinking about the situation."
+            ]
+        },
+        ANXIETY_1: {
+            title: "Questionnaire No.2",
+            instructions: "1 = Not at all typical of me, 5 = Very typical of me",
+            scale: 5,
+            items: [
+                "My worries overwhelm me.",
+                "Many situations make me worry.",
+                "I know I should not worry about things, but I just cannot help it.",
+                "When I am under pressure I worry a lot.",
+                "I am always worrying about something.",
+                "As soon as I finish one task, I start to worry about everything else I have to do.",
+                "I have been a worrier all my life.",
+                "I notice that I have been worrying about things."
+            ]
+        },
+        ANXIETY_2: {
+            title: "Questionnaire No.3",
+            instructions: "How much have you felt or experienced things this way in general?<br>1 = Not at all, 5 = Extremely",
+            scale: 5,
+            items: [
+                "Was short of breath",
+                "Felt dizzy or light-headed",
+                "Hands were cold or sweaty",
+                "Hands were shaky",
+                "Had trouble swallowing",
+                "Had hot or cold spells",
+                "Felt like I was choking",
+                "Muscles twitched or trembled",
+                "Was trembling or shaking",
+                "Had a very dry mouth"
+            ]
+        }
+    };
+
+    // ============================================
+    // TRIAL CONFIGURATIONS
+    // ============================================
+    const CONFIG = {
+        transitions: { 
+            'S':   { left: 'M1L', right: 'M1R' }, 
+            'M1L': { left: 'T1',  right: 'T2' }, 
+            'M1R': { left: 'T3',  right: 'T4' } 
+        },
+        // Structure Learning: 32 forced trials (2 blocks x 4 sets x 4 trials)
+        structureForced: [
+            // Block 1, Set 1 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            // Block 1, Set 2 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            // Block 1, Set 3 - RARE
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2', transition: 'rare' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1', transition: 'rare' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4', transition: 'rare' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3', transition: 'rare' },
+            // Block 1, Set 4 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            // Block 2, Set 1 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            // Block 2, Set 2 - RARE
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2', transition: 'rare' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1', transition: 'rare' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4', transition: 'rare' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3', transition: 'rare' },
+            // Block 2, Set 3 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            // Block 2, Set 4 - COMMON
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' }
+        ],
+        structureRemedial: [
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3', transition: 'rare' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2', transition: 'rare' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' }
+             
+            
+        ],
+        // Value Learning: 8 forced + 12 free = 20 trials
+        valueTrials: [
+            { type: 'forced', step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { type: 'forced', step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3', transition: 'common' },
+            { type: 'forced', step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1', transition: 'rare' },
+            { type: 'forced', step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            { type: 'forced', step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1', transition: 'common' },
+            { type: 'forced', step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4', transition: 'rare' },
+            { type: 'forced', step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2', transition: 'common' },
+            { type: 'forced', step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'rare' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'rare' },
+            { type: 'free', transition: 'common' },
+            { type: 'free', transition: 'rare' },
+            { type: 'free', transition: 'common' }
+        ],
+        queryOptionsFeather: [-20, -10, -5, 5],
+        queryOptionsTriangle: [-5, 5, 10, 20]
+    };
+
+    // ============================================
+    // SESSION STATE
+    // ============================================
+    let session = {
+        participantId: prolificID ? prolificID : `TEST-${Math.floor(Math.random() * 100000)}`,
+        seed: prolificID ? stringToSeed(prolificID) : Math.floor(Math.random() * 1000000),
+        phase: 'INIT', 
+        trialIndex: 0,
+        subStep: 0, 
+        currentState: 'S',
+        score: 0,
+        missedTrials: 0,
+        quizAttempts: 0,
+        currentTerminalValues: { ...TERMINAL_VALUES.initial },
+        timestamps: { start: Date.now(), lastAction: Date.now() },
+        isProcessing: false,
+        timerId: null,
+        data: {
+            status: 'IN_PROGRESS',
+            prolific_id: prolificID || null,
+            fixed_seed: null,
+            timestamp_start: null,
+            timestamp_end: null,
+            total_task_duration_sec: null,
+            Structure_Quiz_Attempts: 0,
+            Knowledge_Check_Accuracy: null,
+            Reflection_Time_R1_Full: null,
+            Reflection_Time_R2_Full: null
+        }
+    };
+
+    session.data.fixed_seed = session.seed;
+    session.data.timestamp_start = new Date().toISOString();
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    function init() { 
+        lucide.createIcons(); 
+        window.addEventListener('keydown', handleKeyDown); 
+        renderConsent(); 
+    }
+
+    function handleKeyDown(e) {
+        if (e.code === 'Space') { e.preventDefault(); return; }
+        
+        const learningPhases = ['STRUCTURE_LEARNING', 'STRUCTURE_REMEDIAL', 'VALUE_LEARNING'];
+        if (learningPhases.includes(session.phase) && !session.isProcessing) {
+            if (e.key === 'ArrowLeft') processMove('left');
+            if (e.key === 'ArrowRight') processMove('right');
+        }
+    }
+
+    // ============================================
+    // TIMER FUNCTIONS
+    // ============================================
+    function startTimer() {
+        if (session.subStep > 1) return; 
+        clearTimeout(session.timerId);
+        session.timerId = setTimeout(handleTimeout, 5000);
+    }
+
+    function stopTimer() {
+        clearTimeout(session.timerId);
+    }
+
+    function handleTimeout() {
+        if (session.isProcessing) return;
+        session.missedTrials++;
+        if (session.missedTrials >= 5) {
+            showGameOver();
+        } else {
+            showTimeoutModal();
+        }
+    }
+
+    function showTimeoutModal() {
+        session.isProcessing = true; 
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-8"><div class="p-6 bg-red-900/40 border border-red-500/40 rounded-full"><i data-lucide="alert-circle" class="w-16 h-16 text-red-500"></i></div></div>
+            <h2 class="text-4xl font-extrabold mb-6 text-white">Too Slow!</h2>
+            <p class="text-slate-300 text-xl mb-4">You have <strong>5 seconds</strong> per action.</p>
+            <div class="text-6xl font-black text-red-500 mb-8">Strike ${session.missedTrials}/5</div>
+            <button id="timeout-confirm" class="action-btn">I Understand</button>
+        `;
+        lucide.createIcons();
+        document.getElementById('timeout-confirm').onclick = () => {
+            dismissModal();
+            session.isProcessing = false; 
+            resetTrial(true);
+        };
+    }
+
+    function showGameOver() {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-8"><div class="p-6 bg-slate-800 border border-slate-600 rounded-full"><i data-lucide="x-octagon" class="w-16 h-16 text-slate-400"></i></div></div>
+            <h2 class="text-4xl font-extrabold mb-6 text-white">Game Over</h2>
+            <p class="text-slate-300 text-2xl mb-10">You missed too many trials.</p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="location.reload()" class="action-btn">Restart</button>
+                <button onclick="finishAll(true)" class="secondary-btn">Leave</button>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+
+    // ============================================
+    // GAME MECHANICS
+    // ============================================
+    function triggerShake() {
+        const instr = document.getElementById('instruction-layer');
+        gsap.to(instr, { x: 10, duration: 0.05, yoyo: true, repeat: 5, color: '#ef4444', borderColor: '#ef4444' });
+        setTimeout(() => {
+            gsap.to(instr, { x: 0, color: '#a5b4fc', borderColor: 'rgba(99, 102, 241, 0.3)' });
+        }, 300);
+    }
+
+    function processMove(dir) {
+        let requiredDir = null;
+        let trialConfig = null;
+
+        if (session.phase === 'STRUCTURE_LEARNING' && session.trialIndex < 32) {
+            trialConfig = CONFIG.structureForced[session.trialIndex];
+            requiredDir = (session.subStep === 0) ? trialConfig.step0 : trialConfig.step1;
+        } else if (session.phase === 'STRUCTURE_REMEDIAL' && session.trialIndex < 10) {
+            trialConfig = CONFIG.structureRemedial[session.trialIndex];
+            requiredDir = (session.subStep === 0) ? trialConfig.step0 : trialConfig.step1;
+        } else if (session.phase === 'VALUE_LEARNING' && session.trialIndex < 20) {
+            trialConfig = CONFIG.valueTrials[session.trialIndex];
+            if (trialConfig.type === 'forced') {
+                // FORCE BOTH STEPS
+                if (session.subStep === 0) requiredDir = trialConfig.step0;
+                if (session.subStep === 1) requiredDir = trialConfig.step1;
+            }
+        }
+
+        if (requiredDir && dir !== requiredDir) {
+            triggerShake(); return; 
+        }
+
+        stopTimer();
+        const rt = Date.now() - session.timestamps.lastAction;
+        session.isProcessing = true;
+        
+        document.getElementById('instruction-layer').style.opacity = "0";
+        document.getElementById('state-anchor').style.opacity = "0";
+
+        setTimeout(() => {
+            let nextState;
+            const intended = CONFIG.transitions[session.currentState][dir];
+            const slipState = CONFIG.transitions[session.currentState][dir === 'left' ? 'right' : 'left'];
+            let transitionType = 'common';
+
+            if (session.subStep === 0) {
+                if (session.phase === 'STRUCTURE_LEARNING') {
+                    nextState = CONFIG.structureForced[session.trialIndex].forceM;
+                } else if (session.phase === 'STRUCTURE_REMEDIAL') {
+                    nextState = CONFIG.structureRemedial[session.trialIndex].forceM;
+                } else if (session.phase === 'VALUE_LEARNING') {
+                    trialConfig = CONFIG.valueTrials[session.trialIndex];
+                    nextState = trialConfig.type === 'forced' ? trialConfig.forceM : intended;
+                } else {
+                    nextState = intended;
+                }
+            } else {
+                if (session.phase === 'STRUCTURE_LEARNING') {
+                    trialConfig = CONFIG.structureForced[session.trialIndex];
+                    nextState = trialConfig.forceT;
+                    transitionType = trialConfig.transition;
+                } else if (session.phase === 'STRUCTURE_REMEDIAL') {
+                    trialConfig = CONFIG.structureRemedial[session.trialIndex];
+                    nextState = trialConfig.forceT;
+                    transitionType = trialConfig.transition;
+                } else if (session.phase === 'VALUE_LEARNING') {
+                    trialConfig = CONFIG.valueTrials[session.trialIndex];
+                    transitionType = trialConfig.transition;
+                    // IF FORCED, USE forceT. OTHERWISE USE PROBABILITY.
+                    if (trialConfig.type === 'forced' && session.subStep === 1) {
+                        nextState = trialConfig.forceT;
+                    } else {
+                        nextState = (transitionType === 'rare') ? slipState : intended;
+                    }
+                } else {
+                    nextState = intended;
+                }
+            }
+
+            let prevState = session.currentState;
+            session.currentState = nextState;
+            session.subStep++;
+
+            // Log data in wide format
+            const trialNum = session.trialIndex + 1;
+            if (session.phase === 'STRUCTURE_LEARNING') {
+                if (session.subStep === 1) {
+                    session.data[`SL_T${trialNum}_Step0_Choice`] = dir;
+                    session.data[`SL_T${trialNum}_Step0_RT`] = rt;
+                } else {
+                    session.data[`SL_T${trialNum}_Step1_Choice`] = dir;
+                    session.data[`SL_T${trialNum}_Step1_RT`] = rt;
+                    session.data[`SL_T${trialNum}_Transition`] = transitionType;
+                }
+            } else if (session.phase === 'VALUE_LEARNING') {
+                if (session.subStep === 1) {
+                    session.data[`VL_T${trialNum}_Step0_Choice`] = dir;
+                    session.data[`VL_T${trialNum}_Step0_RT`] = rt;
+                    session.data[`VL_T${trialNum}_Type`] = CONFIG.valueTrials[session.trialIndex].type;
+                } else {
+                    session.data[`VL_T${trialNum}_Step1_Choice`] = dir;
+                    session.data[`VL_T${trialNum}_Step1_RT`] = rt;
+                    session.data[`VL_T${trialNum}_Transition`] = transitionType;
+                }
+            }
+
+            renderState(); 
+            document.getElementById('state-anchor').style.opacity = "1";
+            
+            // Add 950ms delay on ALL state transitions
+            const needsDelay = session.phase === 'STRUCTURE_LEARNING' || 
+                              session.phase === 'STRUCTURE_REMEDIAL' || 
+                              session.phase === 'VALUE_LEARNING';
+            
+            if (needsDelay && session.subStep === 1) {
+                // Show reward at middle state in value learning
+                if (session.phase === 'VALUE_LEARNING') {
+                    const pts = (session.currentState === 'M1L') ? 5 : -5;
+                    showRewardOverlay(pts);
+                }
+                
+                session.isProcessing = true; 
+                setTimeout(() => {
+                    if (session.phase === 'VALUE_LEARNING') {
+                        hideRewardOverlay();
+                    }
+                    document.getElementById('instruction-layer').style.opacity = "1";
+                    session.isProcessing = false; 
+                    session.timestamps.lastAction = Date.now();
+                    startTimer(); 
+                }, 950);
+            } else {
+                if (session.subStep < 2) document.getElementById('instruction-layer').style.opacity = "1";
+                if (session.subStep === 2) {
+                    setTimeout(nextTrial, 950); 
+                } else {
+                    session.isProcessing = false;
+                    session.timestamps.lastAction = Date.now();
+                    startTimer();
+                }
+            }
+        }, 300);
+    }
+
+    function nextTrial() {
+        document.getElementById('state-anchor').style.opacity = "0";
+        setTimeout(() => {
+            session.trialIndex++;
+            if (session.phase === 'STRUCTURE_LEARNING' && session.trialIndex >= 32) { startPhase('QUIZ'); return; }
+            if (session.phase === 'STRUCTURE_REMEDIAL' && session.trialIndex >= 10) { startPhase('QUIZ'); return; }
+            if (session.phase === 'VALUE_LEARNING' && session.trialIndex >= 20) { startPhase('KNOWLEDGE_CHECK'); return; }
+            resetTrial();
+        }, 500);
+    }
+
+    function resetTrial(isRedo = false) {
+        session.currentState = 'S';
+        session.subStep = 0;
+        session.timestamps.lastAction = Date.now();
+        session.isProcessing = false; 
+        renderState();
+        document.getElementById('state-anchor').style.opacity = "1";
+        updateHUD();
+        startTimer();
+    }
+
+    function showRewardOverlay(pts) {
+        const el = document.getElementById('reward-display');
+        el.innerText = `${pts > 0 ? '+' : ''}${pts}`;
+        el.className = pts > 0 ? 'reward-pos' : 'reward-neg';
+        gsap.to(el, { opacity: 1, scale: 1.2, duration: 0.3, ease: 'back.out' });
+    }
+
+    function hideRewardOverlay() {
+        gsap.to(document.getElementById('reward-display'), { opacity: 0, scale: 0.8, duration: 0.3 });
+    }
+
+    function renderState() {
+        const d = ICONS[session.currentState];
+        const anchor = document.getElementById('state-anchor');
+        anchor.style.backgroundColor = d.color + '40'; 
+        anchor.style.borderColor = d.color;
+        document.getElementById('icon-target').innerHTML = `<i data-lucide="${d.icon}" class="w-48 h-48 text-white drop-shadow-2xl"></i>`;
+        lucide.createIcons({ root: document.getElementById('icon-target') });
+
+        const instr = document.getElementById('instruction-layer');
+        if (session.subStep < 2) {
+            let dir = '';
+            let isFree = false;
+            
+            if (session.phase === 'STRUCTURE_LEARNING') {
+                dir = (session.subStep === 0) ? CONFIG.structureForced[session.trialIndex].step0 : CONFIG.structureForced[session.trialIndex].step1;
+            } else if (session.phase === 'STRUCTURE_REMEDIAL') {
+                dir = (session.subStep === 0) ? CONFIG.structureRemedial[session.trialIndex].step0 : CONFIG.structureRemedial[session.trialIndex].step1;
+            } else if (session.phase === 'VALUE_LEARNING') {
+                const tc = CONFIG.valueTrials[session.trialIndex];
+                if (tc.type === 'forced') {
+                    // SHOW ARROW FOR BOTH STEPS
+                    dir = (session.subStep === 0) ? tc.step0 : tc.step1;
+                } else {
+                    isFree = true;
+                }
+            }
+
+            if (isFree) {
+                instr.innerHTML = `CHOOSE: <span class="key-cap">←</span> or <span class="key-cap">→</span>`;
+            } else {
+                instr.innerHTML = `PRESS <span class="key-cap">${dir === 'left' ? '←' : '→'}</span>`;
+            }
+            instr.style.opacity = "1";
+        } else {
+            instr.style.opacity = "0";
+        }
+    }
+
+    function updateHUD() {
+        let label = session.phase;
+        if (session.phase === 'STRUCTURE_LEARNING') label = 'LEARNING MAP';
+        if (session.phase === 'STRUCTURE_REMEDIAL') label = 'RE-LEARNING';
+        if (session.phase === 'VALUE_LEARNING') label = 'LEARNING VALUES';
+        document.getElementById('phase-label').innerText = label;
+    }
+
+    // ============================================
+    // MODAL HELPERS
+    // ============================================
+    function showModal(content, btnText, callback) {
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = content + `<div class="mt-10"><button id="modal-confirm" class="action-btn">${btnText}</button></div>`;
+        lucide.createIcons();
+        document.getElementById('modal-confirm').onclick = callback;
+    }
+
+    function dismissModal() {
+        document.getElementById('overlay').classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // ============================================
+    // CONSENT
+    // ============================================
+    function renderConsent() {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-6">
+                <div class="p-4 bg-slate-800 border border-slate-600 rounded-full">
+                    <i data-lucide="file-text" class="w-12 h-12 text-slate-300"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black mb-4 tracking-tight text-white">Informed Consent</h1>
+            <p class="text-slate-400 text-base mb-6 max-w-xl mx-auto">Before we begin, please carefully read the following form. If you have read and agree with the terms, please check the box below to sign your informed consent.</p>
+            
+            <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-8 mb-8 text-left h-[40vh] overflow-y-auto custom-scrollbar text-slate-300 space-y-4 shadow-inner text-sm leading-relaxed">
+                <h3 class="text-lg font-bold text-white mb-2">Welcome!</h3>
+                <ul class="list-disc pl-5 space-y-2 marker:text-indigo-500">
+                    <li>You are invited to participate in a research study about decision-making, which aims to better understand how people learn and plan.</li>
+                    <li>This study is being conducted by researchers at Bar-Ilan University: Adi Pizanti and Dr. Paul Sharp.</li>
+                </ul>
+                <p>You will complete a decision-making task where you use arrow keys to navigate between visual shapes on a map. First, you will learn the structure of the map. Then you will learn which shapes give points. The point values may change during the task, and you will be asked to make choices and provide ratings about your preferences. Finally, you will complete a few short questionnaires. Your bonus payment will be based on your performance.</p>
+                <p class="bg-indigo-900/30 p-3 rounded-lg border border-indigo-500/30"><strong class="text-indigo-200">Payment rate:</strong> You will receive a rate of 9$ per hour, where the amount of time is based on mean estimates of time taken to complete each task.</p>
+                <ul class="list-disc pl-5 space-y-2 marker:text-indigo-500">
+                    <li>By providing your consent to participate, you agree to take part in both sessions of the study.</li>
+                    <li>Participation is entirely voluntary. You may choose not to take part at all. You may also change your mind later and stop participating, even if you agreed earlier. If you are invited to the second session and decide not to continue, you may withdraw without any consequences.</li>
+                    <li>You have the right to withdraw your consent at any time. Any data processed before your withdrawal will still be lawfully collected and can be used for the research.</li>
+                    <li>Participation may not benefit you directly, but others may ultimately benefit from the knowledge obtained.</li>
+                    <li>There are no known risks or discomforts associated with this study.</li>
+                    <li>Please be assured that your responses are fully anonymized. Your user ID will be replaced with a non-identifiable ID number.</li>
+                    <li>The data you provide will be used for scientific analysis and securely stored. Research findings will be made available to you upon request and will be shared more broadly, for example, through publications, data repositories and at conferences.</li>
+                    <li>The collected data may also be used for educational purposes or in future research, even in other fields of study. Your data may be reused for these purposes.</li>
+                    <li>If you decide to stop taking part in this study, if you have any questions, concerns, or complaints, please contact the researchers at <span class="text-white font-bold select-all">[CONTACT_EMAIL]</span>.</li>
+                    <li>If you need a copy of this consent form, you may print out this page.</li>
+                </ul>
+                <p class="font-bold text-white mt-4 pt-4 border-t border-white/10">If you are at least 18 years old, understand the statements above, and freely consent to participate in this study, click on the "I agree" button.</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-6">
+                <label class="flex items-center gap-3 cursor-pointer group bg-slate-800/50 px-6 py-3 rounded-xl border border-transparent hover:border-indigo-500 transition-all">
+                    <input type="checkbox" id="consent-check" class="w-5 h-5 rounded border-slate-600 bg-slate-700 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">I agree</span>
+                </label>
+                
+                <button id="consent-submit" class="action-btn opacity-50 pointer-events-none filter grayscale transition-all duration-300">
+                    Start Experiment
+                </button>
+            </div>
+        `;
+
+        lucide.createIcons();
+        const checkbox = document.getElementById('consent-check');
+        const btn = document.getElementById('consent-submit');
+
+        checkbox.onchange = (e) => {
+            if (e.target.checked) {
+                btn.classList.remove('opacity-50', 'pointer-events-none', 'grayscale');
+                btn.classList.add('transform', 'scale-105');
+            } else {
+                btn.classList.add('opacity-50', 'pointer-events-none', 'grayscale');
+                btn.classList.remove('transform', 'scale-105');
+            }
+        };
+
+        btn.onclick = () => {
+            showWelcomeSlide();
+        };
+    }
+
+    function showWelcomeSlide() {
+        showModal(
+            `<div class="flex justify-center mb-10"><div class="p-6 bg-indigo-500/20 border border-indigo-500/40 rounded-full"><i data-lucide="gamepad-2" class="w-16 h-16 text-indigo-300"></i></div></div>
+            <h2 class="text-4xl font-black mb-8 text-white">Welcome to the Experiment</h2>
+            <p class="text-slate-200 text-xl mb-4">You are about to explore a digital map. Your goal:</p>
+            <p class="text-2xl font-bold text-white mb-6">Learn how to move between the shapes.</p>
+            <div class="bg-slate-800/80 p-6 rounded-2xl border border-white/10 inline-block">
+                <p>Use <span class="key-cap">← LEFT</span> and <span class="key-cap">RIGHT →</span> arrow keys.</p>
+            </div>`, 
+            "START TASK",
+            () => startPhase('STRUCTURE_LEARNING')
+        );
+    }
+
+    // ============================================
+    // PHASE MANAGEMENT
+    // ============================================
+    function startPhase(newPhase) {
+        session.phase = newPhase;
+        session.trialIndex = 0;
+        session.subStep = 0;
+
+        if (newPhase === 'STRUCTURE_LEARNING') {
+            dismissModal();
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-blue-500/20 border border-blue-500/40 rounded-full"><i data-lucide="map" class="w-16 h-16 text-blue-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 text-white">Part 1: Learn the Structure</h2>
+                <div class="text-slate-200 text-xl text-left max-w-xl mx-auto space-y-4">
+                    <p>1. Press <span class="key-cap">←</span> or <span class="key-cap">→</span> to navigate.</p>
+                    <p>2. Watch which shapes appear next.</p>
+                    <p>3. Most actions lead to the same place, but occasionally you'll see something different.</p>
+                    <p class="text-slate-400 text-base mt-4">🚫 No points yet. Just learn the map.</p>
+                </div>`,
+                "Begin",
+                () => { dismissModal(); document.getElementById('hud').classList.remove('opacity-0'); resetTrial(); }
+            );
+        }
+        else if (newPhase === 'STRUCTURE_REMEDIAL') {
+            dismissModal();
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-yellow-500/20 border border-yellow-500/40 rounded-full"><i data-lucide="refresh-cw" class="w-16 h-16 text-yellow-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 text-white">Let's Practice Again</h2>
+                <p class="text-slate-200 text-xl">10 more practice trials to learn the structure.</p>`,
+                "Continue",
+                () => { dismissModal(); document.getElementById('hud').classList.remove('opacity-0'); resetTrial(); }
+            );
+        }
+        else if (newPhase === 'QUIZ') {
+            document.getElementById('hud').classList.add('opacity-0');
+            runStructureQuiz();
+        }
+        else if (newPhase === 'VALUE_BRIEF') {
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-yellow-500/20 border border-yellow-500/40 rounded-full"><i data-lucide="coins" class="w-16 h-16 text-yellow-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 text-white">Part 2: Learn Values</h2>
+                <p class="text-slate-200 text-xl mb-6">Now shapes give or subtract points.</p>
+                <div class="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                    <div class="bg-green-900/30 border border-green-500/30 p-4 rounded-xl"><div class="text-green-400 text-3xl font-black">+</div><p class="text-green-100">Good!</p></div>
+                    <div class="bg-red-900/30 border border-red-500/30 p-4 rounded-xl"><div class="text-red-400 text-3xl font-black">-</div><p class="text-red-100">Bad!</p></div>
+                </div>`,
+                "Let's Go",
+                () => startPhase('VALUE_LEARNING')
+            );
+        }
+        else if (newPhase === 'VALUE_LEARNING') {
+            dismissModal();
+            document.getElementById('hud').classList.remove('opacity-0');
+            resetTrial();
+        }
+        else if (newPhase === 'KNOWLEDGE_CHECK') {
+            document.getElementById('hud').classList.add('opacity-0');
+            runKnowledgeCheck();
+        }
+        else if (newPhase === 'RATING_1') { runRatingSequence(1); }
+        else if (newPhase === 'RATING_2') { runRatingSequence(2); }
+        else if (newPhase === 'RATING_3') { runRatingSequence(3); }
+        else if (newPhase === 'REVAL_1_SCREEN') { showRevalScreen(1); }
+        else if (newPhase === 'REVAL_1_ACTIVE') { runActiveRevaluation(1); }
+        else if (newPhase === 'REVAL_2_SCREEN') { showRevalScreen(2); }
+        else if (newPhase === 'REVAL_2_ACTIVE') { runActiveRevaluation(2); }
+        else if (newPhase === 'QUERY_1') { runQuerySequence(1); }
+        else if (newPhase === 'QUERY_2') { runQuerySequence(2); }
+        else if (newPhase === 'DONE') { startPhase('ERQ'); }
+        else if (newPhase === 'ERQ') { runSurvey('ERQ', () => startPhase('ANXIETY_1')); }
+        else if (newPhase === 'ANXIETY_1') { runSurvey('ANXIETY_1', () => startPhase('ANXIETY_2')); }
+        else if (newPhase === 'ANXIETY_2') { runSurvey('ANXIETY_2', () => finishAll()); }
+    }
+
+    // ============================================
+    // STRUCTURE QUIZ (6/6 required)
+    // ============================================
+    function runStructureQuiz() {
+        session.quizAttempts++;
+        session.data.Structure_Quiz_Attempts = session.quizAttempts;
+        
+        const questions = [
+            { id: 1, start: 'S',   action: 'LEFT',  correct: 'M1L', label: 'Start + Left' },
+            { id: 2, start: 'S',   action: 'RIGHT', correct: 'M1R', label: 'Start + Right' },
+            { id: 3, start: 'M1L', action: 'LEFT',  correct: 'T1',  label: 'Feather + Left' },
+            { id: 4, start: 'M1L', action: 'RIGHT', correct: 'T2',  label: 'Feather + Right' },
+            { id: 5, start: 'M1R', action: 'LEFT',  correct: 'T3',  label: 'Triangle + Left' },
+            { id: 6, start: 'M1R', action: 'RIGHT', correct: 'T4',  label: 'Triangle + Right' }
+        ];
+        
+        let qIdx = 0, correctCount = 0;
+        
+        function showQuestion() {
+            if (qIdx >= questions.length) {
+                if (correctCount === 6) {
+                    showModal(`<div class="flex justify-center mb-10"><div class="p-6 bg-green-900/40 border border-green-500/40 rounded-full"><i data-lucide="check-circle" class="w-16 h-16 text-green-500"></i></div></div><h2 class="text-4xl font-black mb-6 text-white">Perfect!</h2><p class="text-slate-300 text-xl">You've mastered the map.</p>`, "Continue", () => startPhase('VALUE_BRIEF'));
+                } else {
+                    showModal(`<div class="flex justify-center mb-10"><div class="p-6 bg-red-900/40 border border-red-500/40 rounded-full"><i data-lucide="x-circle" class="w-16 h-16 text-red-500"></i></div></div><h2 class="text-4xl font-black mb-6 text-white">Not Quite</h2><p class="text-slate-300 text-xl">${correctCount}/6 correct. Need 6/6.</p>`, "Practice Again", () => startPhase('STRUCTURE_REMEDIAL'));
+                }
+                return;
+            }
+            
+            const q = questions[qIdx];
+            const startData = ICONS[q.start];
+            const common = CONFIG.transitions[q.start][q.action.toLowerCase()];
+            const rare = CONFIG.transitions[q.start][q.action.toLowerCase() === 'left' ? 'right' : 'left'];
+            // Randomize option order
+            const opts = [common, rare].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="flex flex-col items-center mb-10">
+                    <div class="text-sm font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Starting From</div>
+                    <div class="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl mb-4 border-2 border-white/20" style="background-color: ${startData.color}"><i data-lucide="${startData.icon}" class="w-16 h-16 text-white"></i></div>
+                </div>
+                
+                <h2 class="text-3xl font-bold mb-10 text-center text-slate-200">
+                    If you press <span class="bg-indigo-500/30 px-3 py-1 rounded-lg border border-indigo-500/50 text-white">${q.action}</span>...<br>
+                    where do you <span class="text-green-400 font-black">USUALLY</span> go?
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-8 w-full px-12">
+                    ${opts.map(optKey => {
+                        const opt = ICONS[optKey];
+                        return `<div class="quiz-option cursor-pointer" data-answer="${optKey}">
+                            <div class="option-card group flex flex-col items-center p-6">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4" style="background-color: ${opt.color}"><i data-lucide="${opt.icon}" class="w-10 h-10 text-white"></i></div>
+                                <span class="text-lg font-bold uppercase tracking-widest text-slate-300 group-hover:text-white">${opt.label}</span>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            `;
+            lucide.createIcons();
+            document.querySelectorAll('.quiz-option').forEach(el => {
+                el.onclick = () => { if (el.dataset.answer === q.correct) correctCount++; qIdx++; showQuestion(); };
+            });
+        }
+        showQuestion();
+    }
+
+    // ============================================
+    // KNOWLEDGE CHECK (4 questions, not pass/fail)
+    // ============================================
+    function runKnowledgeCheck() {
+        const allQuestions = [
+            { start: 'M1L', action: 'LEFT', correct: 'T1' },
+            { start: 'M1L', action: 'RIGHT', correct: 'T2' },
+            { start: 'M1R', action: 'LEFT', correct: 'T3' },
+            { start: 'M1R', action: 'RIGHT', correct: 'T4' }
+        ];
+        // Shuffle questions
+        const questions = allQuestions.sort(() => Math.random() - 0.5);
+        let qIdx = 0, correctCount = 0;
+        
+        // Show intro modal
+        showModal(
+            `<div class="flex justify-center mb-10"><div class="p-6 bg-cyan-500/20 border border-cyan-500/40 rounded-full"><i data-lucide="brain" class="w-16 h-16 text-cyan-300"></i></div></div>
+            <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Quick Knowledge Check</h2>
+            <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto">
+                <p class="mb-4">Let's verify you remember the map structure.</p>
+                <p class="text-slate-400">This is just a quick reminder - takes about 30 seconds.</p>
+            </div>`,
+            "Continue",
+            () => showQuestion()
+        );
+        
+        function showQuestion() {
+            if (qIdx >= questions.length) {
+                session.data.Knowledge_Check_Accuracy = correctCount / 4;
+                startPhase('RATING_1');
+                return;
+            }
+            const q = questions[qIdx];
+            const startData = ICONS[q.start];
+            const common = CONFIG.transitions[q.start][q.action.toLowerCase()];
+            const rare = CONFIG.transitions[q.start][q.action.toLowerCase() === 'left' ? 'right' : 'left'];
+            // Randomize option order
+            const opts = [common, rare].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="flex items-center justify-center gap-2 mb-6">
+                    <span class="text-sm font-bold uppercase tracking-[0.2em] text-cyan-400">Quick Check</span>
+                    <span class="text-slate-500">•</span>
+                    <span class="text-sm text-slate-400">${qIdx + 1} of ${questions.length}</span>
+                </div>
+                
+                <div class="flex flex-col items-center mb-8">
+                    <div class="text-sm font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Starting From</div>
+                    <div class="w-24 h-24 rounded-2xl flex items-center justify-center shadow-xl mb-4 border-2 border-white/20" style="background-color: ${startData.color}"><i data-lucide="${startData.icon}" class="w-12 h-12 text-white"></i></div>
+                </div>
+                
+                <h2 class="text-2xl font-bold mb-8 text-center text-slate-200">
+                    If you press <span class="bg-indigo-500/30 px-3 py-1 rounded-lg border border-indigo-500/50 text-white">${q.action}</span>,<br>
+                    where do you <span class="text-green-400 font-black">USUALLY</span> go?
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                    ${opts.map(optKey => {
+                        const opt = ICONS[optKey];
+                        return `<div class="quiz-option cursor-pointer" data-answer="${optKey}">
+                            <div class="option-card p-4">
+                                <div class="w-14 h-14 rounded-lg flex items-center justify-center mb-2" style="background-color: ${opt.color}"><i data-lucide="${opt.icon}" class="w-7 h-7 text-white"></i></div>
+                                <span class="text-white font-bold">${opt.label}</span>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            `;
+            lucide.createIcons();
+            document.querySelectorAll('.quiz-option').forEach(el => {
+                el.onclick = () => { if (el.dataset.answer === q.correct) correctCount++; qIdx++; showQuestion(); };
+            });
+        }
+    }
+
+    // ============================================
+    // RATINGS (-30 to +30)
+    // ============================================
+    function runRatingSequence(ratingNum) {
+        const states = ['M1L', 'M1R'];
+        let idx = 0;
+        
+        function showRating() {
+            if (idx >= states.length) {
+                if (ratingNum === 1) startPhase('REVAL_1_SCREEN');
+                else if (ratingNum === 2) startPhase('QUERY_1');
+                else startPhase('QUERY_2');
+                return;
+            }
+            
+            const state = states[idx];
+            const icon = ICONS[state];
+            const label = state === 'M1L' ? 'Feather' : 'Triangle';
+            
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="text-orange-400 font-bold text-sm mb-4">Rating ${ratingNum} • ${label}</div>
+                <div class="w-24 h-24 mx-auto rounded-2xl flex items-center justify-center mb-6" style="background:${icon.color}40;border:3px solid ${icon.color}"><i data-lucide="${icon.icon}" class="w-12 h-12 text-white"></i></div>
+                <p class="text-lg text-white mb-2 max-w-xl mx-auto">If you started a trial, walked through this state, then chose where to go...</p>
+                <p class="text-2xl text-white font-bold mb-8">How many points would you get?</p>
+                <div class="max-w-lg mx-auto mb-4">
+                    <input type="range" id="rating-slider" min="-30" max="30" step="5" value="0">
+                    <div class="flex justify-between mt-2 text-sm"><span class="text-red-400">-30</span><span class="text-slate-500">-15</span><span class="text-slate-400">0</span><span class="text-slate-500">+15</span><span class="text-green-400">+30</span></div>
+                </div>
+                <div class="text-4xl font-black mb-6" id="rating-value">0</div>
+                <button id="rating-confirm" class="action-btn">Confirm</button>
+            `;
+            lucide.createIcons();
+            
+            const slider = document.getElementById('rating-slider');
+            const valueDisplay = document.getElementById('rating-value');
+            const startTime = Date.now();
+            
+            slider.oninput = () => {
+                const val = parseInt(slider.value);
+                valueDisplay.innerText = val > 0 ? `+${val}` : val;
+                valueDisplay.className = `text-4xl font-black mb-6 ${val > 0 ? 'text-green-400' : val < 0 ? 'text-red-400' : 'text-slate-300'}`;
+            };
+            
+            document.getElementById('rating-confirm').onclick = () => {
+                session.data[`Rating_${ratingNum}_${label}_Val`] = parseInt(slider.value);
+                session.data[`Rating_${ratingNum}_${label}_RT`] = Date.now() - startTime;
+                idx++;
+                showRating();
+            };
+        }
+        showRating();
+    }
+
+    // ============================================
+    // REVALUATION SCREEN
+    // ============================================
+    function showRevalScreen(revalNum) {
+        const terminals = ['T1', 'T2', 'T3', 'T4'];
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-8"><div class="p-6 bg-purple-500/20 border border-purple-500/40 rounded-full"><i data-lucide="alert-triangle" class="w-16 h-16 text-purple-300"></i></div></div>
+            <h2 class="text-4xl font-black mb-8 text-white">Values Have Updated</h2>
+            <div class="grid grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
+                ${terminals.map(t => `<div class="flex flex-col items-center"><div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-2" style="background:${ICONS[t].color}40;border:2px solid ${ICONS[t].color}"><i data-lucide="${ICONS[t].icon}" class="w-10 h-10 text-white"></i></div><div class="text-3xl font-black text-slate-400">?</div></div>`).join('')}
+            </div>
+            <button id="see-values-btn" class="action-btn">See New Values</button>
+        `;
+        lucide.createIcons();
+        document.getElementById('see-values-btn').onclick = () => startPhase(revalNum === 1 ? 'REVAL_1_ACTIVE' : 'REVAL_2_ACTIVE');
+    }
+
+    // ============================================
+    // ACTIVE REVALUATION (16 click-to-reveal)
+    // ============================================
+    function runActiveRevaluation(revalNum) {
+        session.currentTerminalValues = revalNum === 1 ? { ...TERMINAL_VALUES.afterReval1 } : { ...TERMINAL_VALUES.afterReval2 };
+        
+        let trials = [];
+        ['T1', 'T2', 'T3', 'T4'].forEach(t => { for (let i = 0; i < 4; i++) trials.push(t); });
+        trials = shuffleWithSeed(trials, session.seed + revalNum * 1000);
+        
+        let idx = 0;
+        
+        function showTrial() {
+            if (idx >= trials.length) {
+                showReflectionCountdown(revalNum);
+                return;
+            }
+            
+            const terminal = trials[idx];
+            const icon = ICONS[terminal];
+            const value = session.currentTerminalValues[terminal];
+            const trialNum = idx + 1;
+            
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="text-purple-400 font-bold text-sm mb-4">Learning Values • ${trialNum} of 16</div>
+                <p class="text-slate-300 text-lg mb-8">Click the shape to reveal its value</p>
+                <div id="reveal-card" class="reveal-card mx-auto" style="background:${icon.color}40;border-color:${icon.color}">
+                    <i data-lucide="${icon.icon}" class="w-20 h-20 text-white"></i>
+                    <div id="reveal-value" class="text-4xl font-black mt-4 text-slate-500">?</div>
+                </div>
+                <div id="next-prompt" class="mt-8 opacity-0 transition-opacity duration-300">
+                    <button id="next-btn" class="action-btn">Next</button>
+                </div>
+            `;
+            lucide.createIcons();
+            
+            const card = document.getElementById('reveal-card');
+            const valueEl = document.getElementById('reveal-value');
+            const nextPrompt = document.getElementById('next-prompt');
+            let revealed = false;
+            const appearTime = Date.now();
+            
+            card.onclick = () => {
+                if (revealed) return;
+                revealed = true;
+                const clickTime = Date.now();
+                
+                card.classList.add('revealed');
+                valueEl.innerText = value > 0 ? `+${value}` : value;
+                valueEl.className = `text-4xl font-black mt-4 ${value > 0 ? 'text-green-400' : value < 0 ? 'text-red-400' : 'text-slate-300'}`;
+                
+                session.data[`R${revalNum}_T${trialNum}_Icon`] = icon.label;
+                session.data[`R${revalNum}_T${trialNum}_Click_RT`] = clickTime - appearTime;
+                
+                // 1.2s lock before showing next button
+                setTimeout(() => {
+                    nextPrompt.classList.remove('opacity-0');
+                    const stayStart = Date.now();
+                    
+                    document.getElementById('next-btn').onclick = () => {
+                        session.data[`R${revalNum}_T${trialNum}_Stay_Duration`] = Date.now() - stayStart;
+                        idx++;
+                        showTrial();
+                    };
+                }, 1200);
+            };
+        }
+        showTrial();
+    }
+
+    // ============================================
+    // 10-SECOND REFLECTION
+    // ============================================
+    function showReflectionCountdown(revalNum) {
+        let seconds = 10;
+        const startTime = Date.now();
+        let intervalId = null;
+        
+        function update() {
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="countdown-circle mx-auto mb-8">${seconds}</div>
+                <h2 class="text-2xl font-bold text-white mb-4">Think About Your Strategy</h2>
+                <p class="text-slate-300 max-w-lg mx-auto">How do these new values impact your choices?</p>
+                <p class="text-slate-500 text-sm mt-6">Continuing in ${seconds} second${seconds !== 1 ? 's' : ''}...</p>
+            `;
+            
+            if (seconds <= 0) {
+                clearInterval(intervalId);
+                session.data[`Reflection_Time_R${revalNum}_Full`] = (Date.now() - startTime) >= 9500;
+                startPhase(revalNum === 1 ? 'RATING_2' : 'RATING_3');
+            }
+        }
+        
+        update();
+        intervalId = setInterval(() => {
+            seconds--;
+            update();
+        }, 1000);
+    }
+
+    // ============================================
+    // QUERIES (8 per revaluation)
+    // ============================================
+    function runQuerySequence(queryNum) {
+        let queries = [];
+        CONFIG.queryOptionsFeather.forEach(v => queries.push({ state: 'M1L', label: 'Feather', fixedValue: v }));
+        CONFIG.queryOptionsTriangle.forEach(v => queries.push({ state: 'M1R', label: 'Triangle', fixedValue: v }));
+        queries = shuffleWithSeed(queries, session.seed + queryNum * 2000);
+        
+        let idx = 0;
+        
+        function showQuery() {
+            if (idx >= queries.length) {
+                startPhase(queryNum === 1 ? 'REVAL_2_SCREEN' : 'DONE');
+                return;
+            }
+            
+            const q = queries[idx];
+            const icon = ICONS[q.state];
+            const trialNum = idx + 1;
+            const fixedDisplay = q.fixedValue > 0 ? `+${q.fixedValue}` : q.fixedValue;
+            
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="text-indigo-400 font-bold text-sm mb-6">Decision ${trialNum} of 8</div>
+                <h2 class="text-2xl font-bold text-white mb-8">Which would you prefer?</h2>
+                <div class="grid grid-cols-2 gap-8 max-w-2xl mx-auto">
+                    <div class="query-option cursor-pointer" data-choice="journey">
+                        <div class="option-card p-6 h-full">
+                            <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4" style="background:${icon.color}40;border:3px solid ${icon.color}"><i data-lucide="${icon.icon}" class="w-10 h-10 text-white"></i></div>
+                            <p class="text-lg font-bold text-white mb-2">Navigate from ${q.label}</p>
+                            <p class="text-sm text-slate-400">Go through ${q.label}, then choose your path.</p>
+                        </div>
+                    </div>
+                    <div class="query-option cursor-pointer" data-choice="fixed">
+                        <div class="option-card p-6 h-full">
+                            <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4 ${q.fixedValue >= 0 ? 'bg-green-500/40 border-green-500' : 'bg-red-500/40 border-red-500'}" style="border-width:3px"><i data-lucide="${q.fixedValue >= 0 ? 'plus' : 'minus'}" class="w-10 h-10 text-white"></i></div>
+                            <p class="text-3xl font-black ${q.fixedValue >= 0 ? 'text-green-400' : 'text-red-400'} mb-2">${fixedDisplay}</p>
+                            <p class="text-sm text-slate-400">Get ${fixedDisplay} points guaranteed.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            
+            const startTime = Date.now();
+            document.querySelectorAll('.query-option').forEach(el => {
+                el.onclick = () => {
+                    session.data[`Query_${queryNum}_T${trialNum}_State`] = q.label;
+                    session.data[`Query_${queryNum}_T${trialNum}_Choice`] = el.dataset.choice === 'journey' ? 1 : 0;
+                    session.data[`Query_${queryNum}_T${trialNum}_FixedOffer`] = q.fixedValue;
+                    session.data[`Query_${queryNum}_T${trialNum}_RT`] = Date.now() - startTime;
+                    idx++;
+                    showQuery();
+                };
+            });
+        }
+        showQuery();
+    }
+
+    // ============================================
+    // SURVEYS (all questions on one page like previous version)
+    // ============================================
+    let currentSurveyAnswers = {};
+    
+    function runSurvey(surveyKey, onComplete) {
+        const survey = SURVEY_DATA[surveyKey];
+        currentSurveyAnswers = {};
+        
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        
+        const itemsHtml = survey.items.map((item, idx) => {
+            let btnsHtml = '';
+            for(let i = 1; i <= survey.scale; i++) {
+                btnsHtml += `<button class="likert-btn" onclick="selectLikert('${surveyKey}', ${idx}, ${i}, this)">${i}</button>`;
+            }
+            return `<div class="mb-8 border-b border-white/10 pb-8 text-left">
+                <p class="mb-4 text-slate-200 font-medium text-xl">${idx + 1}. ${item}</p>
+                <div class="flex flex-wrap gap-3">${btnsHtml}</div>
+            </div>`;
+        }).join('');
+
+        document.getElementById('overlay-content').innerHTML = `
+            <h2 class="text-3xl font-extrabold mb-8 tracking-tight text-white text-center">${survey.title}</h2>
+            <div class="bg-indigo-900/30 border-l-4 border-indigo-500 p-6 mb-8 rounded-r-xl text-left">
+                <p class="text-lg text-indigo-100">${survey.instructions}</p>
+            </div>
+            <div class="space-y-8 text-left h-[50vh] overflow-y-auto pr-4 custom-scrollbar">
+                ${itemsHtml}
+            </div>
+            <div class="mt-8 text-center"><button onclick="submitSurvey('${surveyKey}')" class="action-btn">Next Section</button></div>
+        `;
+        
+        // Store callback for later
+        window.currentSurveyCallback = onComplete;
+    }
+    
+    window.selectLikert = function(surveyKey, qIdx, value, btnElem) {
+        currentSurveyAnswers[qIdx] = value;
+        const parent = btnElem.parentElement;
+        parent.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+        btnElem.classList.add('selected');
+    };
+    
+    window.submitSurvey = function(surveyKey) {
+        const survey = SURVEY_DATA[surveyKey];
+        const totalQs = survey.items.length;
+        
+        if (Object.keys(currentSurveyAnswers).length < totalQs) { 
+            alert("Please answer all questions before continuing."); 
+            return; 
+        }
+        
+        // Store individual responses
+        for (let i = 0; i < totalQs; i++) {
+            session.data[`Survey_${surveyKey}_Q${i + 1}_Raw`] = currentSurveyAnswers[i];
+        }
+        
+        // Calculate total score
+        const total = Object.values(currentSurveyAnswers).reduce((a, b) => a + b, 0);
+        session.data[`Survey_${surveyKey}_Total_Score`] = total;
+        
+        // Call the stored callback
+        if (window.currentSurveyCallback) {
+            window.currentSurveyCallback();
+        }
+    };
+
+    // ============================================
+    // FINISH
+    // ============================================
+    async function finishAll(abandoned = false) {
+        session.data.status = abandoned ? 'ABANDONED' : 'COMPLETED';
+        session.data.timestamp_end = new Date().toISOString();
+        session.data.total_task_duration_sec = Math.round((Date.now() - session.timestamps.start) / 1000);
+        
+        try {
+            await db.collection('experiment_results').doc(session.participantId).set(session.data);
+            console.log("Data saved");
+        } catch (e) {
+            console.error("Save error:", e);
+        }
+        
+        if (!abandoned) {
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="flex justify-center mb-10"><div class="p-6 bg-green-900/40 border border-green-500/40 rounded-full"><i data-lucide="check" class="w-16 h-16 text-green-500"></i></div></div>
+                <h2 class="text-4xl font-black mb-6 text-white">Task Complete!</h2>
+                <p class="text-slate-300 text-xl mb-4">Thank you for participating.</p>
+                <p class="text-slate-400 mb-8">Redirecting to Prolific...</p>
+            `;
+            lucide.createIcons();
+            // TODO: Add Prolific completion code here
+            setTimeout(() => { window.location.href = "https://app.prolific.com/submissions/complete?cc=YOUR_CODE_HERE"; }, 3000);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
