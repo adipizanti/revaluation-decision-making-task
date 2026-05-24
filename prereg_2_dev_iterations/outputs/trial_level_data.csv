@@ -1,0 +1,241 @@
+subject_id,anxiety,anxiety_group,query,state,state_ev,offer,ev_diff,choice,optimal,correct,ev_diff_bin
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+65fb70d4e69155a62d58ac90,11,High Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+65fb70d4e69155a62d58ac90,11,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+612adba08b8235b31539c704,29,High Anxiety,1,Triangle,15,10,5,0,1,0,0 to 5
+612adba08b8235b31539c704,29,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+612adba08b8235b31539c704,29,High Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+612adba08b8235b31539c704,29,High Anxiety,1,Triangle,15,5,10,0,1,0,5 to 10
+612adba08b8235b31539c704,29,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+612adba08b8235b31539c704,29,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+612adba08b8235b31539c704,29,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+612adba08b8235b31539c704,29,High Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+612adba08b8235b31539c704,29,High Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+612adba08b8235b31539c704,29,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+612adba08b8235b31539c704,29,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+612adba08b8235b31539c704,29,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+612adba08b8235b31539c704,29,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+612adba08b8235b31539c704,29,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+612adba08b8235b31539c704,29,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+612adba08b8235b31539c704,29,High Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+6960a545231c35c6048d7234,10,Low Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+6960a545231c35c6048d7234,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+6960a545231c35c6048d7234,10,Low Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+6960a545231c35c6048d7234,10,Low Anxiety,1,Feather,-15,5,-20,1,0,0,< -10
+6960a545231c35c6048d7234,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+6960a545231c35c6048d7234,10,Low Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+6960a545231c35c6048d7234,10,Low Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+6960a545231c35c6048d7234,10,Low Anxiety,1,Triangle,15,20,-5,1,0,0,-10 to -5
+6960a545231c35c6048d7234,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+6960a545231c35c6048d7234,10,Low Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+6960a545231c35c6048d7234,10,Low Anxiety,2,Feather,0,5,-5,1,0,0,-10 to -5
+6960a545231c35c6048d7234,10,Low Anxiety,2,Triangle,10,-5,15,0,1,0,10 to 15
+6960a545231c35c6048d7234,10,Low Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+6960a545231c35c6048d7234,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+6960a545231c35c6048d7234,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+6960a545231c35c6048d7234,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+5ba78b71d60daf0001532d5b,10,Low Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Feather,0,5,-5,1,0,0,-10 to -5
+5ba78b71d60daf0001532d5b,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+67a96562e2b052e6c15ed963,29,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+67a96562e2b052e6c15ed963,29,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Triangle,15,5,10,0,1,0,5 to 10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Triangle,15,10,5,0,1,0,0 to 5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+63fbf0e3b18cc14adc0dbfb6,14,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Triangle,15,10,5,0,1,0,0 to 5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Triangle,15,5,10,0,1,0,5 to 10
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+67ee50bbaa206db46d5e94c2,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,1,Feather,-15,5,-20,1,0,0,< -10
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Feather,0,-5,5,0,1,0,0 to 5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+66e2abbef5fe9e10f5bff804,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Triangle,15,10,5,0,1,0,0 to 5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+66d1fdd400acfdbc181f41e0,10,Low Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+666f76b68b89442817be678a,30,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+666f76b68b89442817be678a,30,High Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+666f76b68b89442817be678a,30,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+666f76b68b89442817be678a,30,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+666f76b68b89442817be678a,30,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+666f76b68b89442817be678a,30,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+666f76b68b89442817be678a,30,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+666f76b68b89442817be678a,30,High Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+666f76b68b89442817be678a,30,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+666f76b68b89442817be678a,30,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+666f76b68b89442817be678a,30,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+666f76b68b89442817be678a,30,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+666f76b68b89442817be678a,30,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+666f76b68b89442817be678a,30,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+666f76b68b89442817be678a,30,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+666f76b68b89442817be678a,30,High Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Feather,-15,5,-20,1,0,0,< -10
+5e7fa0e918b10804bb87eb63,17,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Triangle,10,-5,15,0,1,0,10 to 15
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+5e7fa0e918b10804bb87eb63,17,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+6065f9d75bd3321f0bafa750,17,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+6065f9d75bd3321f0bafa750,17,High Anxiety,2,Feather,0,-5,5,0,1,0,0 to 5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Triangle,15,10,5,0,1,0,0 to 5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Feather,-15,-10,-5,1,0,0,-10 to -5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Triangle,15,5,10,0,1,0,5 to 10
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Feather,-15,-5,-10,1,0,0,< -10
+5d7fd2a5987f70001602d95b,10,Low Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Triangle,10,10,0,0,0,1,-5 to 0
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Triangle,10,5,5,0,1,0,0 to 5
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+5d7fd2a5987f70001602d95b,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+56d1f7f67bbc32000589a588,14,High Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Feather,0,5,-5,1,0,0,-10 to -5
+56d1f7f67bbc32000589a588,14,High Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Triangle,15,-5,20,1,1,1,> 15
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Feather,-15,5,-20,0,0,1,< -10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Triangle,15,20,-5,0,0,1,-10 to -5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Triangle,15,5,10,1,1,1,5 to 10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Triangle,15,10,5,1,1,1,0 to 5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Feather,-15,-10,-5,0,0,1,-10 to -5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Feather,-15,-5,-10,0,0,1,< -10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,1,Feather,-15,-20,5,1,1,1,0 to 5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Feather,0,-10,10,1,1,1,5 to 10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Triangle,10,20,-10,0,0,1,< -10
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Feather,0,5,-5,0,0,1,-10 to -5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Feather,0,-20,20,1,1,1,> 15
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Triangle,10,-5,15,1,1,1,10 to 15
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Triangle,10,10,0,1,0,0,-5 to 0
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Feather,0,-5,5,1,1,1,0 to 5
+667d08e12ac1bcbdd829a936,10,Low Anxiety,2,Triangle,10,5,5,1,1,1,0 to 5

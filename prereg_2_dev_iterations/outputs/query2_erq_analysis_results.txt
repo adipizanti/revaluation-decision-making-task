@@ -1,0 +1,43 @@
+QUERY 2 ANALYSIS: ERQ-REAPPRAISAL AND TRIANGLE PREFERENCE
+======================================================================
+
+Sample Size: 15
+Triangle Preference Rate: 0.333
+
+BIVARIATE CORRELATIONS:
+  ERQ-Reappraisal × Triangle Pref: r=-0.434, p=0.106
+  Anxiety × Triangle Pref: r=0.096, p=0.734
+  ERQ-Reappraisal × Anxiety: r=-0.221, p=0.428
+
+======================================================================
+LOGISTIC REGRESSION: FULL RESULTS TABLE
+======================================================================
+
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:       prefers_triangle   No. Observations:                   15
+Model:                          Logit   Df Residuals:                       12
+Method:                           MLE   Df Model:                            2
+Date:                Wed, 04 Feb 2026   Pseudo R-squ.:                  0.1680
+Time:                        11:14:47   Log-Likelihood:                -7.9437
+converged:                       True   LL-Null:                       -9.5477
+Covariance Type:            nonrobust   LLR p-value:                    0.2011
+=====================================================================================
+                        coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------
+const                -0.9061      0.662     -1.369      0.171      -2.204       0.392
+erq_reappraisal_z    -1.1805      0.786     -1.502      0.133      -2.721       0.360
+anxiety_total_z       0.0065      0.597      0.011      0.991      -1.163       1.176
+=====================================================================================
+
+======================================================================
+ODDS RATIOS
+======================================================================
+
+                   Odds Ratio  95% CI Lower  95% CI Upper   p-value
+const                0.404083      0.110382      1.479252  0.171125
+erq_reappraisal_z    0.307137      0.065836      1.432850  0.133031
+anxiety_total_z      1.006550      0.312461      3.242457  0.991272
+
+INTERPRETATION:
+  ERQ-Reappraisal: p=0.1330

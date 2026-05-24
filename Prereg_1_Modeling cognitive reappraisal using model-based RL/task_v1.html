@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reappraisal Task V4</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@500;800&display=swap');
+        
+        body { 
+            background-color: #0f172a; 
+            color: #f1f5f9; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            user-select: none;
+            padding: 20px;
+        }
+
+        /* --- V4 STANDARDIZED MODAL --- */
+        .modal-card { 
+            background: rgba(30, 41, 59, 0.98); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            border-radius: 32px; 
+            width: 900px; 
+            max-width: 95vw;
+            padding: 3.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            text-align: center; 
+            position: relative;
+            max-height: 95vh;
+            overflow-y: auto;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Big Action Button */
+        .action-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: white; 
+            padding: 18px 48px; 
+            border-radius: 16px;
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em;
+            display: inline-block;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.1s;
+            cursor: pointer;
+        }
+        .action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .action-btn:active { transform: translateY(0); }
+
+        /* Secondary Button */
+        .secondary-btn {
+            background: transparent;
+            color: #94a3b8;
+            padding: 18px 48px;
+            border-radius: 16px;
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            border: 2px solid #334155;
+            transition: all 0.2s;
+        }
+        .secondary-btn:hover { background: #1e293b; color: white; border-color: #475569; }
+
+        /* Highlight Boxes */
+        .highlight-box { 
+            padding: 1.5rem 2rem; 
+            border-radius: 16px; 
+            margin: 1.5rem 0; 
+            text-align: left; 
+            border-left: 6px solid; 
+            background: rgba(15, 23, 42, 0.6); 
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; gap: 2rem;
+        }
+
+        /* Keyboard Key Visuals */
+        .key-cap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1);
+            color: #1e293b;
+            border-radius: 6px;
+            border-bottom: 3px solid #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.9em;
+            margin: 0 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Option Cards */
+        .option-card {
+            border: 3px solid #334155; 
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 24px; padding: 2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100%; width: 100%; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-card:hover { border-color: #6366f1; background: rgba(30, 41, 59, 0.8); transform: translateY(-4px); }
+
+        /* HUD */
+        .hud-frame {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 99px;
+            padding: 10px 30px;
+            z-index: 40;
+            display: flex; gap: 15px; align-items: center;
+        }
+
+        /* Slider */
+        input[type=range] { width: 100%; height: 12px; background: #334155; border-radius: 99px; appearance: none; outline: none; }
+        input[type=range]::-webkit-slider-thumb { 
+            appearance: none; width: 40px; height: 40px; background: #f8fafc; 
+            border-radius: 50%; cursor: pointer; border: 4px solid #ef4444; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+        /* Timer Bar */
+        .timer-bar-bg { position: fixed; top: 0; left: 0; width: 100%; height: 6px; background: #1e293b; z-index: 50; }
+        .timer-bar-fill { height: 100%; background: #6366f1; width: 100%; transform-origin: left; }
+
+        /* Game Elements */
+        .instruction-pill { 
+            background: rgba(99, 102, 241, 0.15); 
+            border: 1px solid rgba(99, 102, 241, 0.3); 
+            border-radius: 12px; padding: 0.75rem 2rem; 
+            color: #a5b4fc; font-weight: 700; letter-spacing: 0.05em;
+        }
+        
+        .state-container { 
+            width: 340px; height: 340px; 
+            transition: opacity 0.15s ease, transform 0.3s ease; 
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Reward Display */
+        #reward-display {
+            position: fixed; top: 25%; left: 50%; transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace; font-size: 6rem; font-weight: 800;
+            z-index: 60; opacity: 0; pointer-events: none;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .reward-pos { color: #4ade80; }
+        .reward-neg { color: #ef4444; }
+
+        /* Survey Likert */
+        .likert-btn {
+            width: 50px; height: 50px; border-radius: 10px; background: #334155;
+            border: 1px solid #475569; color: #cbd5e1; font-weight: bold; transition: all 0.2s ease;
+        }
+        .likert-btn:hover { background: #4f46e5; color: white; }
+        .likert-btn.selected { background: #4f46e5; color: white; border-color: white; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body>
+
+    <div class="timer-bar-bg"><div id="timer-fill" class="timer-bar-fill"></div></div>
+    <div id="reward-display"></div>
+
+    <div id="hud" class="hud-frame opacity-0 transition-opacity duration-500">
+        <div class="p-2 bg-indigo-500/20 border border-indigo-500/40 rounded-lg">
+            <i data-lucide="map-pin" class="w-5 h-5 text-indigo-300"></i>
+        </div>
+        <div class="text-left">
+            <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold">Current Phase</div>
+            <div id="phase-label" class="text-sm font-black text-white uppercase tracking-wide">INIT</div>
+        </div>
+    </div>
+
+    <main id="game-stage" class="flex flex-col items-center justify-center relative">
+        <div id="instruction-wrapper" class="mb-10 h-12 flex justify-center items-center">
+            <div id="instruction-layer" class="instruction-pill text-xl opacity-0 transition-opacity"></div>
+        </div>
+        
+        <div id="state-anchor" class="state-container flex items-center justify-center relative">
+            <div id="icon-target"></div>
+        </div>
+        
+        <div id="terminal-action" class="mt-12 h-8"></div>
+    </main>
+
+    <div id="overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 transition-opacity duration-300 opacity-0 pointer-events-none overflow-hidden">
+        <div id="overlay-content" class="modal-card"></div>
+    </div>
+
+    <script>
+    // --- FIREBASE CONFIGURATION ---
+    const firebaseConfig = {
+       apiKey: "XXXX",
+       authDomain: "XXXX",
+       projectId: "XXXX",
+       storageBucket: "XXXX",
+       messagingSenderId: "XXXX",
+       appId: "XXXX"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.signInAnonymously()
+        .then(() => console.log("Signed in anonymously"))
+        .catch((error) => console.error("Auth failed:", error));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolificID = urlParams.get('PROLIFIC_PID');
+
+    // --- GAME CONSTANTS ---
+    const ICONS = {
+        'S':   { icon: 'circle',   color: '#94a3b8', label: 'Circle' },
+        'M1L': { icon: 'feather',  color: '#f032e6', label: 'Feather' },
+        'M1R': { icon: 'triangle', color: '#4363d8', label: 'Triangle' },
+        'T1':  { icon: 'square',   color: '#22c55e', label: 'Square' }, // Greenish
+        'T2':  { icon: 'lamp-floor', color: '#eab308', label: 'Lamp' }, // Yellow
+        'T3':  { icon: 'amphora',   color: '#f97316', label: 'Amphora'}, // Orange
+        'T4':  { icon: 'cloud',    color: '#991b1b', label: 'Cloud' }   // Red
+    };
+
+    const SURVEY_DATA = {
+        ERQ: {
+            title: "Questionnaire No.1",
+            instructions: "1 = Strongly Disagree, 4 = Neutral, 7 = Strongly Agree",
+            scale: 7,
+            items: [
+                "When I want to feel more positive emotion (such as joy or amusement), I change what I’m thinking about.",
+                "I keep my emotions to myself.",
+                "When I want to feel less negative emotion (such as sadness or anger), I change what I’m thinking about.",
+                "When I am feeling positive emotions, I am careful not to express them.",
+                "When I’m faced with a stressful situation, I make myself think about it in a way that helps me stay calm.",
+                "I control my emotions by not expressing them.",
+                "When I want to feel more positive emotion, I change the way I’m thinking about the situation.",
+                "I control my emotions by changing the way I think about the situation I’m in.",
+                "When I am feeling negative emotions, I make sure not to express them.",
+                "When I want to feel less negative emotion, I change the way I’m thinking about the situation."
+            ]
+        },
+        ANXIETY_1: {
+            title: "Questionnaire No.2",
+            instructions: "1 = Not at all typical of me, 5 = Very typical of me",
+            scale: 5,
+            items: [
+                "My worries overwhelm me.",
+                "Many situations make me worry.",
+                "I know I should not worry about things, but I just cannot help it.",
+                "When I am under pressure I worry a lot.",
+                "I am always worrying about something.",
+                "As soon as I finish one task, I start to worry about everything else I have to do.",
+                "I have been a worrier all my life.",
+                "I notice that I have been worrying about things."
+            ]
+        },
+        ANXIETY_2: {
+            title: "Questionnaire No.3",
+            instructions: "How much have you felt or experienced things this way in general? <br>1 = Not at all, 5 = Extremely",
+            scale: 5,
+            items: [
+                "Was short of breath",
+                "Felt dizzy or light-headed",
+                "Hands were cold or sweaty",
+                "Hands were shaky",
+                "Had trouble swallowing",
+                "Had hot or cold spells",
+                "Felt like I was choking",
+                "Muscles twitched or trembled",
+                "Was trembling or shaking",
+                "Had a very dry mouth"
+            ]
+        }
+    };
+
+    const CONFIG = {
+        probs: { common: 0.75, rare: 0.25 },
+        transitions: { 
+            'S':   { left: 'M1L', right: 'M1R' }, 
+            'M1L': { left: 'T1',  right: 'T2' }, 
+            'M1R': { left: 'T3',  right: 'T4' } 
+        },
+        structureForced: [
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3' }, 
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3' }  
+        ],
+        structureRemedial: [
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' },
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' },
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' },
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' },
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3' }  
+        ],
+        valueForced: [
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' }, 
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' }, 
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T3' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T4' }, 
+            { step0: 'left',  step1: 'left',  forceM: 'M1L', forceT: 'T2' }, 
+            { step0: 'right', step1: 'right', forceM: 'M1R', forceT: 'T3' }, 
+            { step0: 'left',  step1: 'right', forceM: 'M1L', forceT: 'T1' }, 
+            { step0: 'right', step1: 'left',  forceM: 'M1R', forceT: 'T4' }  
+        ],
+        valueFreeDeck: ['common', 'common', 'common', 'rare']
+    };
+
+    let session = {
+        participantId: prolificID ? prolificID : `TEST-${Math.floor(Math.random() * 100000)}`,
+        phase: 'INIT', 
+        trialIndex: 0,
+        subStep: 0, 
+        currentState: 'S',
+        score: 0,
+        missedTrials: 0,
+        logs: { moves: [], ratings: [], queries: [], quiz: [], events: [], surveys: {} }, 
+        timestamps: { start: Date.now(), lastAction: Date.now() },
+        isProcessing: false,
+        timerId: null,
+    };
+
+    function init() { 
+        lucide.createIcons(); 
+        window.addEventListener('keydown', handleKeyDown); 
+        renderConsent(); 
+    }
+
+    function handleKeyDown(e) {
+        if (e.code === 'Space') { e.preventDefault(); return; } 
+        const learningPhases = ['STRUCTURE_LEARNING', 'STRUCTURE_REMEDIAL', 'VALUE_LEARNING'];
+        if (learningPhases.includes(session.phase) && !session.isProcessing) {
+            if (e.key === 'ArrowLeft') processMove('left');
+            if (e.key === 'ArrowRight') processMove('right');
+        }
+    }
+
+    function startTimer() {
+        if (session.subStep > 1) return; 
+        const duration = 5000;
+        clearTimeout(session.timerId);
+        session.timerId = setTimeout(handleTimeout, duration);
+    }
+
+    function stopTimer() {
+        clearTimeout(session.timerId);
+    }
+
+    function handleTimeout() {
+        if (session.isProcessing) return;
+        session.missedTrials++;
+        session.logs.events.push({ event: 'TIMEOUT', phase: session.phase, trial: session.trialIndex, step: session.subStep });
+
+        if (session.missedTrials >= 5) {
+            showGameOver();
+        } else {
+            showTimeoutModal();
+        }
+    }
+
+    function showTimeoutModal() {
+        session.isProcessing = true; 
+        
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-8"><div class="p-6 bg-red-900/40 border border-red-500/40 rounded-full"><i data-lucide="alert-circle" class="w-16 h-16 text-red-500"></i></div></div>
+            <h2 class="text-4xl font-extrabold mb-6 tracking-tight text-white">Too Slow!</h2>
+            <div class="text-slate-300 text-xl mb-10 max-w-lg mx-auto text-center leading-relaxed">
+                <p class="mb-4">You have <strong>5 seconds</strong> per action.</p>
+                <div class="text-6xl font-black text-red-500 mb-8 mt-8">Strike ${session.missedTrials}/5</div>
+                <p class="text-slate-400 text-2xl font-bold">If you reach 5 strikes, the task will end.</p>
+            </div>
+            <div class="mt-8 text-center"><button id="timeout-confirm" class="action-btn">I Understand</button></div>
+        `;
+        lucide.createIcons();
+        document.getElementById('timeout-confirm').onclick = () => {
+            dismissModal();
+            session.isProcessing = false; 
+            resetTrial(true);
+        };
+    }
+
+    function showGameOver() {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-8"><div class="p-6 bg-slate-800 border border-slate-600 rounded-full"><i data-lucide="x-octagon" class="w-16 h-16 text-slate-400"></i></div></div>
+            <h2 class="text-4xl font-extrabold mb-6 tracking-tight text-white">Game Over</h2>
+            <div class="text-slate-300 text-2xl mb-10 text-center">You missed too many trials.</div>
+            <div class="flex gap-4 justify-center">
+                <button onclick="location.reload()" class="action-btn">Restart Task</button>
+                <button onclick="finishAll(true)" class="secondary-btn">Leave</button>
+            </div>
+        `;
+        lucide.createIcons();
+    }
+
+    function triggerShake() {
+        const instr = document.getElementById('instruction-layer');
+        gsap.to(instr, { x: 10, duration: 0.05, yoyo: true, repeat: 5, color: '#ef4444', borderColor: '#ef4444' });
+        setTimeout(() => {
+            gsap.to(instr, { x: 0, color: '#a5b4fc', borderColor: 'rgba(99, 102, 241, 0.3)' });
+        }, 300);
+    }
+
+    function processMove(dir) {
+        let requiredDir = null;
+        if (session.phase === 'STRUCTURE_LEARNING' && session.trialIndex < 32) {
+            requiredDir = (session.subStep === 0) ? CONFIG.structureForced[session.trialIndex].step0 : CONFIG.structureForced[session.trialIndex].step1;
+        } else if (session.phase === 'STRUCTURE_REMEDIAL' && session.trialIndex < 10) {
+            requiredDir = (session.subStep === 0) ? CONFIG.structureRemedial[session.trialIndex].step0 : CONFIG.structureRemedial[session.trialIndex].step1;
+        } else if (session.phase === 'VALUE_LEARNING' && session.trialIndex < 16) {
+            requiredDir = (session.subStep === 0) ? CONFIG.valueForced[session.trialIndex].step0 : CONFIG.valueForced[session.trialIndex].step1;
+        }
+
+        if (requiredDir && dir !== requiredDir) {
+            triggerShake(); return; 
+        }
+
+        stopTimer();
+        const rt = Date.now() - session.timestamps.lastAction;
+        session.isProcessing = true;
+        
+        document.getElementById('instruction-layer').style.opacity = "0";
+        document.getElementById('state-anchor').style.opacity = "0";
+
+        setTimeout(() => {
+            let nextState;
+            const intended = CONFIG.transitions[session.currentState][dir];
+            const slipState = CONFIG.transitions[session.currentState][dir === 'left' ? 'right' : 'left'];
+            let isSwap = false;
+
+            if (session.subStep === 0) {
+                if (session.phase === 'STRUCTURE_LEARNING') nextState = CONFIG.structureForced[session.trialIndex].forceM;
+                else if (session.phase === 'STRUCTURE_REMEDIAL') nextState = CONFIG.structureRemedial[session.trialIndex].forceM;
+                else if (session.phase === 'VALUE_LEARNING' && session.trialIndex < 16) nextState = CONFIG.valueForced[session.trialIndex].forceM;
+                else nextState = intended; 
+            } else {
+                if (session.phase === 'STRUCTURE_LEARNING') {
+                    nextState = CONFIG.structureForced[session.trialIndex].forceT;
+                    if (nextState !== intended) isSwap = true;
+                } else if (session.phase === 'STRUCTURE_REMEDIAL') {
+                    nextState = CONFIG.structureRemedial[session.trialIndex].forceT;
+                    if (nextState !== intended) isSwap = true;
+                } else if (session.phase === 'VALUE_LEARNING' && session.trialIndex < 16) {
+                    nextState = CONFIG.valueForced[session.trialIndex].forceT;
+                    if (nextState !== intended) isSwap = true;
+                } else {
+                    let outcomeType = CONFIG.valueFreeDeck[(session.trialIndex - 16) % 4]; 
+                    nextState = (outcomeType === 'rare') ? slipState : intended;
+                    if (nextState !== intended) isSwap = true;
+                }
+            }
+
+            let prevState = session.currentState;
+            session.currentState = nextState;
+            session.subStep++;
+            session.logs.moves.push({ phase: session.phase, trial: session.trialIndex, step: session.subStep, choice: dir, from: prevState, to: nextState, swap: isSwap, rt: rt });
+
+            renderState(); 
+            document.getElementById('state-anchor').style.opacity = "1";
+            
+            // --- UPDATED LOGIC FOR DELAYS ---
+            // If we are at step 1 (Middle State), apply delay in both VALUE and STRUCTURE phases
+            const isValuePhase = (session.phase === 'VALUE_LEARNING');
+            const isStructurePhase = (session.phase === 'STRUCTURE_LEARNING');
+            
+            if ((isValuePhase || isStructurePhase) && session.subStep === 1) {
+                document.getElementById('instruction-layer').style.opacity = "0";
+                
+                // Only show points if in Value Learning phase
+                if (isValuePhase) {
+                    const pts = getPoints(session.currentState);
+                    showRewardOverlay(pts);
+                }
+
+                session.isProcessing = true; 
+                setTimeout(() => {
+                    if (isValuePhase) hideRewardOverlay();
+                    document.getElementById('instruction-layer').style.opacity = "1";
+                    session.isProcessing = false; 
+                    session.timestamps.lastAction = Date.now();
+                    startTimer(); 
+                }, 1500);
+            } 
+            else {
+                // Standard transition for other steps / phases
+                if (session.subStep < 2) document.getElementById('instruction-layer').style.opacity = "1";
+                if (session.subStep === 2) {
+                    setTimeout(nextTrial, 1500); 
+                } else {
+                    session.isProcessing = false;
+                    session.timestamps.lastAction = Date.now();
+                    startTimer();
+                }
+            }
+        }, 300);
+    }
+
+    function nextTrial() {
+        document.getElementById('state-anchor').style.opacity = "0";
+        setTimeout(() => {
+            session.trialIndex++;
+            if (session.phase === 'STRUCTURE_LEARNING' && session.trialIndex >= 32) { startPhase('QUIZ'); return; }
+            if (session.phase === 'STRUCTURE_REMEDIAL' && session.trialIndex >= 10) { startPhase('QUIZ'); return; }
+            if (session.phase === 'VALUE_LEARNING' && session.trialIndex >= 20) { startPhase('RATING_1'); return; }
+            resetTrial();
+        }, 500);
+    }
+
+    function resetTrial(isRedo = false) {
+        session.currentState = 'S';
+        session.subStep = 0;
+        session.timestamps.lastAction = Date.now();
+        session.isProcessing = false; 
+        renderState();
+        document.getElementById('state-anchor').style.opacity = "1";
+        updateHUD();
+        startTimer();
+    }
+
+    function getPoints(s) {
+        if (s === 'M1L') return 5; 
+        if (s === 'M1R') return -5; 
+        return 0;
+    }
+
+    function showRewardOverlay(pts) {
+        const el = document.getElementById('reward-display');
+        el.innerText = `${pts > 0 ? '+' : ''}${pts}`;
+        el.className = pts > 0 ? 'reward-pos' : 'reward-neg';
+        gsap.to(el, { opacity: 1, scale: 1.2, duration: 0.3, ease: 'back.out' });
+    }
+
+    function hideRewardOverlay() {
+        const el = document.getElementById('reward-display');
+        gsap.to(el, { opacity: 0, scale: 0.8, duration: 0.3 });
+    }
+
+    function renderState() {
+        const d = ICONS[session.currentState];
+        const anchor = document.getElementById('state-anchor');
+        
+        anchor.style.backgroundColor = d.color + '40'; 
+        anchor.style.borderColor = d.color;
+        
+        document.getElementById('icon-target').innerHTML = `<i data-lucide="${d.icon}" class="w-48 h-48 text-white drop-shadow-2xl"></i>`;
+        lucide.createIcons({ root: document.getElementById('icon-target') });
+
+        const instr = document.getElementById('instruction-layer');
+        if (session.subStep < 2) {
+            let dir = '';
+            if (session.phase === 'STRUCTURE_LEARNING') dir = (session.subStep === 0) ? CONFIG.structureForced[session.trialIndex].step0 : CONFIG.structureForced[session.trialIndex].step1;
+            else if (session.phase === 'STRUCTURE_REMEDIAL') dir = (session.subStep === 0) ? CONFIG.structureRemedial[session.trialIndex].step0 : CONFIG.structureRemedial[session.trialIndex].step1;
+            else if (session.phase === 'VALUE_LEARNING' && session.trialIndex < 16) dir = (session.subStep === 0) ? CONFIG.valueForced[session.trialIndex].step0 : CONFIG.valueForced[session.trialIndex].step1;
+
+            if (dir) {
+                instr.innerHTML = `PRESS <span class="key-cap inline-flex items-center justify-center text-sm" style="width:30px; height:30px;">${dir === 'left' ? '←' : '→'}</span>`;
+            } else {
+                instr.innerText = "Choose Left / Right";
+            }
+            
+            // Logic for when to show instructions initially
+            if (session.phase === 'STRUCTURE_LEARNING' || session.phase === 'STRUCTURE_REMEDIAL') instr.style.opacity = "1";
+            else if (session.phase === 'VALUE_LEARNING' && session.subStep === 0) instr.style.opacity = "1";
+            
+        } else {
+            instr.style.opacity = "0";
+        }
+    }
+
+    function updateHUD() {
+        let label = session.phase;
+        if (session.phase === 'STRUCTURE_LEARNING') label = 'LEARNING MAP';
+        if (session.phase === 'STRUCTURE_REMEDIAL') label = 'RE-LEARNING';
+        if (session.phase === 'VALUE_LEARNING') label = 'LEARNING VALUES';
+        document.getElementById('phase-label').innerText = label;
+    }
+
+    function renderConsent() {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex justify-center mb-6">
+                <div class="p-4 bg-slate-800 border border-slate-600 rounded-full">
+                    <i data-lucide="file-text" class="w-12 h-12 text-slate-300"></i>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black mb-4 tracking-tight text-white">Informed Consent</h1>
+            <p class="text-slate-400 text-base mb-6 max-w-xl mx-auto">Before we begin, please carefully read the following form. If you have read and agree with the terms, please check the box below to sign your informed consent.</p>
+            
+            <div class="bg-slate-900/80 border border-white/10 rounded-2xl p-8 mb-8 text-left h-[40vh] overflow-y-auto custom-scrollbar text-slate-300 space-y-4 shadow-inner text-sm leading-relaxed">
+                <h3 class="text-lg font-bold text-white mb-2">Welcome!</h3>
+                <ul class="list-disc pl-5 space-y-2 marker:text-indigo-500">
+                    <li>You are invited to participate in a research study about decision-making, which aims to better understand how people learn and plan.</li>
+                    <li>This study is being conducted by researchers at Bar-Ilan University: Adi Pizanti and Dr. Paul Sharp.</li>
+                </ul>
+                <p>You will complete a short questionnaire, which should take less than 5 minutes.</p>
+                <p>You may also have a chance to play an online computer game, involving speaking to the computer and potentially other participants. This session should take less than the stated minutes on Prolific, and you will receive a monetary bonus based on your performance!</p>
+                <p class="bg-indigo-900/30 p-3 rounded-lg border border-indigo-500/30"><strong class="text-indigo-200">Payment rate:</strong> You will receive a rate of 9$ per hour, where the amount of time is based on mean estimates of time taken to complete each task.</p>
+                <ul class="list-disc pl-5 space-y-2 marker:text-indigo-500">
+                    <li>By providing your consent to participate, you agree to take part in both sessions of the study.</li>
+                    <li>Participation is entirely voluntary. You may choose not to take part at all. You may also change your mind later and stop participating, even if you agreed earlier. If you are invited to the second session and decide not to continue, you may withdraw without any consequences.</li>
+                    <li>You have the right to withdraw your consent at any time. Any data processed before your withdrawal will still be lawfully collected and can be used for the research.</li>
+                    <li>Participation may not benefit you directly, but others may ultimately benefit from the knowledge obtained.</li>
+                    <li>There are no known risks or discomforts associated with this study.</li>
+                    <li>Please be assured that your responses are fully anonymized. Your user ID will be replaced with a non-identifiable ID number.</li>
+                    <li>The data you provide will be used for scientific analysis and securely stored. Research findings will be made available to you upon request and will be shared more broadly, for example, through publications, data repositories and at conferences.</li>
+                    <li>The collected data may also be used for educational purposes or in future research, even in other fields of study. Your data may be reused for these purposes.</li>
+                    <li>If you decide to stop taking part in this study, if you have any questions, concerns, or complaints, please contact Paul Sharp at <span class="text-white font-bold select-all">paul.sharp@biu.ac.il</span>.</li>
+                    <li>If you need a copy of this consent form, you may print out this page.</li>
+                </ul>
+                <p class="font-bold text-white mt-4 pt-4 border-t border-white/10">If you are at least 18 years old, understand the statements above, and freely consent to participate in this study, click on the "I agree" button.</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-6">
+                <label class="flex items-center gap-3 cursor-pointer group bg-slate-800/50 px-6 py-3 rounded-xl border border-transparent hover:border-indigo-500 transition-all">
+                    <input type="checkbox" id="consent-check" class="w-5 h-5 rounded border-slate-600 bg-slate-700 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-lg font-bold text-slate-200 group-hover:text-white transition-colors">I agree</span>
+                </label>
+                
+                <button id="consent-submit" class="action-btn opacity-50 pointer-events-none filter grayscale transition-all duration-300">
+                    Start Experiment
+                </button>
+            </div>
+        `;
+
+        lucide.createIcons();
+        const checkbox = document.getElementById('consent-check');
+        const btn = document.getElementById('consent-submit');
+
+        checkbox.onchange = (e) => {
+            if (e.target.checked) {
+                btn.classList.remove('opacity-50', 'pointer-events-none', 'grayscale');
+                btn.classList.add('transform', 'scale-105');
+            } else {
+                btn.classList.add('opacity-50', 'pointer-events-none', 'grayscale');
+                btn.classList.remove('transform', 'scale-105');
+            }
+        };
+
+        btn.onclick = () => {
+            session.logs.events.push({ event: 'CONSENT_GIVEN', timestamp: new Date().toISOString() });
+            showWelcomeSlide();
+        };
+    }
+
+    // --- PHASE MANAGEMENT & VISUALS (V4 STYLE) ---
+
+    function startPhase(newPhase) {
+        session.logs.events.push({ event: 'PHASE_START', phase: newPhase, timestamp: new Date().toISOString() });
+        session.phase = newPhase;
+        session.trialIndex = 0;
+        dismissModal(); 
+        
+        if (newPhase === 'STRUCTURE_LEARNING') {
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-blue-500/20 border border-blue-500/40 rounded-full"><i data-lucide="map" class="w-16 h-16 text-blue-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Part 1: Learn the structure</h2>
+                <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto space-y-8">
+                    <p>First, we want you to just figure out how the map is structured.</p>
+                    <ul class="text-left space-y-6 bg-slate-800/50 p-8 rounded-2xl border border-white/10">
+                        <li class="flex gap-4 items-center"><span class="bg-blue-500/20 text-blue-300 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span><span>Press <span class="key-cap">←</span> or <span class="key-cap">→</span> to choose an action.</span></li>
+                        <li class="flex gap-4 items-center"><span class="bg-blue-500/20 text-blue-300 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span><span>Watch which shape appears next.</span></li>
+                        <li class="flex gap-4 items-center"><span class="bg-blue-500/20 text-blue-300 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span><span>Try to find patterns in the movement.</span></li>
+                    </ul>
+                    <div class="text-center"><span class="inline-block px-4 py-2 rounded-lg bg-slate-700 text-slate-300 font-bold text-base border border-slate-600">🚫 No points in this phase. Just practice.</span></div>
+                </div>`,
+                "I'm Ready",
+                () => { dismissModal(); document.getElementById('hud').classList.remove('opacity-0'); resetTrial(); }
+            );
+        }
+        else if (newPhase === 'STRUCTURE_REMEDIAL') {
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-orange-500/20 border border-orange-500/40 rounded-full"><i data-lucide="rotate-ccw" class="w-16 h-16 text-orange-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Let's Review</h2>
+                <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto">
+                    <p class="mb-6">It seems you are still learning the map.</p>
+                    <p class="mb-6 font-bold text-white">We will practice a bit more before continuing.</p>
+                    <p>Pay close attention to where each arrow key takes you.</p>
+                </div>`,
+                "Continue",
+                () => { dismissModal(); document.getElementById('hud').classList.remove('opacity-0'); resetTrial(); }
+            );
+        }
+        else if (newPhase === 'QUIZ') {
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-pink-500/20 border border-pink-500/40 rounded-full"><i data-lucide="graduation-cap" class="w-16 h-16 text-pink-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Structure Test</h2>
+                <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto">
+                    <p>Let's see if you've learned the map structure.</p>
+                    <p class="mt-4">We will ask you <strong class="text-white">6 questions</strong> about which states usually follow which actions.</p>
+                </div>`,
+                "Start Test",
+                () => runQuiz()
+            );
+        }
+        else if (newPhase === 'VALUE_BRIEF') {
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-yellow-500/20 border border-yellow-500/40 rounded-full"><i data-lucide="coins" class="w-16 h-16 text-yellow-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Part 2: Learn reward / punishment locations</h2>
+                <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto">
+                    <p class="mb-8">Now, some shapes give points / subtract points.</p>
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="bg-green-900/30 border border-green-500/30 p-6 rounded-2xl">
+                            <div class="text-green-400 font-black text-3xl mb-2">+ Points</div>
+                            <p class="text-base text-green-100">Finding this adds to your bonus.</p>
+                        </div>
+                        <div class="bg-red-900/30 border border-red-500/30 p-6 rounded-2xl">
+                            <div class="text-red-400 font-black text-3xl mb-2">- Points</div>
+                            <p class="text-base text-red-100">Finding this subtracts from your bonus.</p>
+                        </div>
+                    </div>
+                    <p class="font-bold text-white">Use your map knowledge to find the rewards!</p>
+                </div>`,
+                "Let's Go",
+                () => startPhase('VALUE_LEARNING')
+            );
+        }
+        else if (newPhase === 'VALUE_LEARNING') {
+            resetTrial();
+        }
+        else if (newPhase.startsWith('RATING')) runRatingSequence(newPhase);
+        else if (newPhase === 'REVAL_1') {
+            const blockSquare = getOutcomeUpdateBlock(['T1'], 'Square', 'Now worth <span class="text-red-400 font-black text-3xl">-12</span> points', '#ef4444');
+            const blockCloud = getOutcomeUpdateBlock(['T4'], 'Cloud', 'Now worth <span class="text-green-400 font-black text-3xl">+12</span> points', '#22c55e');
+            
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-purple-500/20 border border-purple-500/40 rounded-full"><i data-lucide="zap" class="w-16 h-16 text-purple-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-2 tracking-tight text-white">Structure update</h2>
+                <p class="text-slate-400 text-lg mb-8">The values of some shapes have changed.</p>
+                <div class="text-left space-y-4 max-w-3xl mx-auto">${blockSquare}${blockCloud}</div>`,
+                "Continue",
+                () => startPhase('QUERY_1')
+            );
+        }
+        else if (newPhase.startsWith('QUERY')) runQuerySequence(newPhase === 'QUERY_1' ? 1 : 2);
+        else if (newPhase === 'REVAL_2') {
+            const blockFeather = getOutcomeUpdateBlock(['T2', 'T1'], 'Both Items', 'Now worth <span class="text-red-400 font-black text-3xl">-12</span> points', '#ef4444');
+            const blockTriangle = getOutcomeUpdateBlock(['T4', 'T3'], 'Both Items', 'Now worth <span class="text-green-400 font-black text-3xl">+12</span> points', '#22c55e');
+            
+            showModal(
+                `<div class="flex justify-center mb-10"><div class="p-6 bg-purple-500/20 border border-purple-500/40 rounded-full"><i data-lucide="alert-triangle" class="w-16 h-16 text-purple-300"></i></div></div>
+                <h2 class="text-4xl font-black mb-2 tracking-tight text-white">Structure update</h2>
+                <p class="text-slate-400 text-lg mb-8">Another update has occurred.</p>
+                <div class="text-left space-y-4 max-w-3xl mx-auto">${blockFeather}${blockTriangle}</div>`,
+                "Continue",
+                () => startPhase('QUERY_2')
+            );
+        }
+        else if (newPhase === 'DONE') startPhase('ERQ'); 
+        else if (newPhase === 'ERQ') renderSurveyPhase('ERQ');
+        else if (newPhase === 'ANXIETY_1') renderSurveyPhase('ANXIETY_1');
+        else if (newPhase === 'ANXIETY_2') renderSurveyPhase('ANXIETY_2');
+    }
+
+    function showWelcomeSlide() {
+        showModal(
+            `<div class="flex justify-center mb-10"><div class="p-6 bg-indigo-500/20 border border-indigo-500/40 rounded-full"><i data-lucide="gamepad-2" class="w-16 h-16 text-indigo-300"></i></div></div>
+            <h2 class="text-4xl font-black mb-8 tracking-tight text-white">Welcome to the Experiment</h2>
+            <div class="text-slate-200 text-xl leading-relaxed text-center space-y-6 max-w-3xl mx-auto">
+                <p>You are about to explore a digital map. Your goal is simple:</p>
+                <p class="text-2xl font-bold text-white py-2">Learn how to move between the shapes.</p>
+                <div class="bg-slate-800/80 p-6 rounded-2xl border border-white/10 text-left">
+                    <div class="flex items-center gap-4 mb-3">
+                        <i data-lucide="keyboard" class="w-8 h-8 text-indigo-400"></i>
+                        <span class="text-indigo-200 font-bold uppercase tracking-widest text-sm">How to Play</span>
+                    </div>
+                    <p>Use your keyboard's <span class="key-cap">← LEFT</span> and <span class="key-cap">RIGHT →</span> arrow keys to make choices.</p>
+                </div>
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-green-900/20 border border-green-500/30 text-left">
+                    <i data-lucide="coins" class="w-6 h-6 text-green-400 mt-1 shrink-0"></i>
+                    <div class="text-base text-green-100">
+                        <strong>Bonus Money:</strong> Later on, you can win bonus money. We will select 10 random trials to determine your bonus.
+                    </div>
+                </div>
+            </div>`, 
+            "START TASK",
+            () => startPhase('STRUCTURE_LEARNING')
+        );
+    }
+
+    // --- HTML HELPERS ---
+
+    function getOutcomeUpdateBlock(outcomeKeys, label, valueHtml, borderColor) {
+        let iconsHtml = outcomeKeys.map(k => {
+            const i = ICONS[k];
+            return `<div class="w-16 h-16 rounded-lg flex items-center justify-center" style="background-color: ${i.color}"><i data-lucide="${i.icon}" class="text-white w-10 h-10"></i></div>`;
+        }).join('<div class="w-2"></div>'); 
+        
+        return `
+            <div class="highlight-box" style="border-color: ${borderColor}; background: linear-gradient(90deg, ${borderColor}15 0%, rgba(15, 23, 42, 0.4) 100%);">
+                <div class="flex gap-2 shrink-0">${iconsHtml}</div>
+                <div>
+                    <div class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">${label}</div>
+                    <div class="text-2xl text-white">${valueHtml}</div>
+                </div>
+            </div>`;
+    }
+
+    function getIconForQuery(key) {
+        if (ICONS[key]) {
+            return `
+            <button class="option-card group">
+                <div class="w-24 h-24 rounded-full flex items-center justify-center mb-4 shadow-xl border-4 border-white/10" style="background-color: ${ICONS[key].color}">
+                    <i data-lucide="${ICONS[key].icon}" class="w-12 h-12 text-white"></i>
+                </div>
+                <span class="text-xl font-bold uppercase tracking-widest text-white group-hover:text-indigo-400 transition-colors">${ICONS[key].label}</span>
+            </button>`;
+        }
+        
+        let colorClass, icon, label, val, textValColor;
+        if (key === 'SAFE') { colorClass = 'bg-slate-600 border-slate-500'; icon = 'shield'; label = 'Safe Option'; val = '0'; textValColor = 'text-slate-300'; }
+        else if (key === 'LOSE5') { colorClass = 'bg-red-600 border-red-500'; icon = 'minus'; label = 'Lose 5'; val = '-5'; textValColor = 'text-red-400'; }
+        else if (key === 'WIN2') { colorClass = 'bg-green-600 border-green-500'; icon = 'plus'; label = 'Win 2'; val = '+2'; textValColor = 'text-green-400'; }
+        else if (key === 'WIN5') { colorClass = 'bg-green-600 border-green-500'; icon = 'plus'; label = 'Win 5'; val = '+5'; textValColor = 'text-green-400'; }
+
+        return `
+            <button class="option-card group">
+                <div class="w-24 h-24 rounded-full flex items-center justify-center mb-4 shadow-xl border-4 ${colorClass}">
+                    <i data-lucide="${icon}" class="w-12 h-12 text-white"></i>
+                </div>
+                <span class="text-xl font-bold uppercase tracking-widest text-white transition-colors">${label}</span>
+                <div class="mt-2 ${textValColor} font-black text-xl">${val}</div>
+            </button>`;
+    }
+
+    let currentSurveyAnswers = {};
+    function renderSurveyPhase(surveyKey) {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        const sData = SURVEY_DATA[surveyKey];
+        currentSurveyAnswers = {}; 
+        
+        const itemsHtml = sData.items.map((item, idx) => {
+            let btnsHtml = '';
+            for(let i=1; i <= sData.scale; i++) {
+                btnsHtml += `<button class="likert-btn" onclick="selectLikert('${surveyKey}', ${idx}, ${i}, this)">${i}</button>`;
+            }
+            return `<div class="mb-8 border-b border-white/10 pb-8 text-left">
+                <p class="mb-4 text-slate-200 font-medium text-xl">${idx + 1}. ${item}</p>
+                <div class="flex flex-wrap gap-3">${btnsHtml}</div>
+            </div>`;
+        }).join('');
+
+        document.getElementById('overlay-content').innerHTML = `
+            <h2 class="text-3xl font-extrabold mb-8 tracking-tight text-white text-center">${sData.title}</h2>
+            <div class="bg-indigo-900/30 border-l-4 border-indigo-500 p-6 mb-8 rounded-r-xl text-left">
+                <p class="text-lg text-indigo-100">${sData.instructions}</p>
+            </div>
+            <div class="space-y-8 text-left h-[50vh] overflow-y-auto pr-4 custom-scrollbar">
+                ${itemsHtml}
+            </div>
+            <div class="mt-8 text-center"><button onclick="submitSurvey('${surveyKey}')" class="action-btn">Next Section</button></div>
+        `;
+    }
+
+    window.selectLikert = function(surveyKey, qIdx, value, btnElem) {
+        currentSurveyAnswers[qIdx] = value;
+        const parent = btnElem.parentElement;
+        parent.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+        btnElem.classList.add('selected');
+    };
+
+    window.submitSurvey = function(surveyKey) {
+        const totalQs = SURVEY_DATA[surveyKey].items.length;
+        if (Object.keys(currentSurveyAnswers).length < totalQs) { alert("Please answer all questions before continuing."); return; }
+        session.logs.surveys[surveyKey] = currentSurveyAnswers;
+        if (surveyKey === 'ERQ') startPhase('ANXIETY_1');
+        else if (surveyKey === 'ANXIETY_1') startPhase('ANXIETY_2');
+        else if (surveyKey === 'ANXIETY_2') finishAll(false);
+    };
+
+    function runQuiz() {
+        const questions = [
+            { id: 1, start: 'S',   action: 'LEFT',  correct: 'M1L', label: 'Start + Left' },
+            { id: 2, start: 'S',   action: 'RIGHT', correct: 'M1R', label: 'Start + Right' },
+            { id: 3, start: 'M1L', action: 'LEFT',  correct: 'T1',  label: 'Feather + Left' },
+            { id: 4, start: 'M1L', action: 'RIGHT', correct: 'T2',  label: 'Feather + Right' },
+            { id: 5, start: 'M1R', action: 'LEFT',  correct: 'T3',  label: 'Triangle + Left' },
+            { id: 6, start: 'M1R', action: 'RIGHT', correct: 'T4',  label: 'Triangle + Right' }
+        ];
+        let qIdx = 0; let correctCount = 0;
+
+        function showQ() {
+            if (qIdx >= questions.length) {
+                if (correctCount >= 6) { startPhase('VALUE_BRIEF'); } 
+                else {
+                    showModal(
+                        `<div class="flex justify-center mb-10"><div class="p-6 bg-red-500/20 border border-red-500/40 rounded-full"><i data-lucide="alert-octagon" class="w-16 h-16 text-red-400"></i></div></div>
+                        <h2 class="text-4xl font-black mb-6 tracking-tight text-white">Try Again</h2>
+                        <div class="text-slate-200 text-xl leading-relaxed max-w-2xl mx-auto">
+                            <p class="mb-4">You scored <strong>${correctCount}/6</strong>.</p>
+                            <p class="text-slate-400">You need 100% accuracy to proceed to the next phase.</p>
+                            <p class="mt-6 font-bold text-white">Let's practice the map a bit more.</p>
+                        </div>`,
+                        "Restart Practice",
+                        () => { session.phase = 'STRUCTURE_REMEDIAL'; session.trialIndex = 0; dismissModal(); document.getElementById('hud').classList.remove('opacity-0'); resetTrial(); }
+                    );
+                }
+                return;
+            }
+            const q = questions[qIdx];
+            const startData = ICONS[q.start];
+            const common = CONFIG.transitions[q.start][q.action.toLowerCase()];
+            const rare = CONFIG.transitions[q.start][q.action.toLowerCase() === 'left' ? 'right' : 'left'];
+            const opts = [common, rare].sort(() => Math.random() - 0.5); 
+
+            document.getElementById('hud').classList.add('opacity-0');
+            document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('overlay-content').innerHTML = `
+                <div class="flex flex-col items-center mb-10">
+                    <div class="text-sm font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Starting From</div>
+                    <div class="w-32 h-32 rounded-3xl flex items-center justify-center shadow-2xl mb-4 border-2 border-white/20" style="background-color: ${startData.color}"><i data-lucide="${startData.icon}" class="w-16 h-16 text-white"></i></div>
+                </div>
+                
+                <h2 class="text-3xl font-bold mb-10 text-center text-slate-200">
+                    If you press <span class="bg-indigo-500/30 px-3 py-1 rounded-lg border border-indigo-500/50 text-white">${q.action}</span>...<br>
+                    where do you <span class="text-green-400 font-black">USUALLY</span> go?
+                </h2>
+                
+                <div class="grid grid-cols-2 gap-8 w-full px-12">
+                    ${opts.map(optKey => {
+                        const opt = ICONS[optKey];
+                        return `<button onclick="handleQuiz('${optKey}')" class="option-card group flex flex-col items-center p-6">
+                            <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-4" style="background-color: ${opt.color}"><i data-lucide="${opt.icon}" class="w-10 h-10 text-white"></i></div>
+                            <span class="text-lg font-bold uppercase tracking-widest text-slate-300 group-hover:text-white">${opt.label}</span>
+                        </button>`;
+                    }).join('')}
+                </div>`;
+            lucide.createIcons();
+            window.handleQuiz = (ans) => {
+                const isCorrect = (ans === q.correct);
+                if (isCorrect) correctCount++;
+                session.logs.quiz.push({ q: q.id, choice: ans, correct: isCorrect });
+                qIdx++; showQ();
+            };
+        }
+        showQ();
+    }
+
+    function runQuerySequence(batchId) {
+        let queries = [];
+        if (batchId === 1) queries = [
+            { id: 'q1_feather', optA: 'M1L', labelA: 'Feather', optB: 'SAFE', labelB: 'Safe Option', instr: "Do you want to start from the Feather, or choose the Safe Option?" }, 
+            { id: 'q1_tri', optA: 'M1R', labelA: 'Triangle', optB: 'WIN2', labelB: 'Win 2 Points', instr: "Do you want to start from the Triangle, or win 2 points?" }
+        ];
+        else queries = [
+            { id: 'q2_feather', optA: 'M1L', labelA: 'Feather', optB: 'LOSE5', labelB: 'Lose 5 Points', instr: "Do you want to start from the Feather, or lose 5 points?" }, 
+            { id: 'q2_tri', optA: 'M1R', labelA: 'Triangle', optB: 'WIN5',  labelB: 'Win 5 Points', instr: "Do you want to start from the Triangle, or win 5 points?" }
+        ];
+        let qIdx = 0;
+        function nextQ() {
+            if (qIdx >= queries.length) {
+                if (batchId === 1) startPhase('RATING_2'); 
+                else startPhase('RATING_3'); 
+                return;
+            }
+            showQuery(queries[qIdx], () => { qIdx++; nextQ(); });
+        }
+        nextQ();
+    }
+
+    function showQuery(q, callback) {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex flex-col items-center">
+                <div class="bg-indigo-900/30 p-6 rounded-2xl mb-10 border border-indigo-500/30 w-full shadow-lg">
+                    <div class="flex items-center justify-center gap-3 mb-4 text-indigo-300"><i data-lucide="brain-circuit" class="w-6 h-6"></i><span class="font-bold uppercase tracking-widest text-sm">Decision Required</span></div>
+                    <p class="text-slate-100 text-2xl leading-relaxed text-center font-medium">${q.instr}</p>
+                </div>
+                
+                <h2 class="text-xl font-black mb-8 uppercase tracking-widest text-center text-slate-500">Choose one option</h2>
+                
+                <div class="grid grid-cols-2 gap-8 w-full h-64">
+                    <div id="btn-A">${getIconForQuery(q.optA)}</div>
+                    <div id="btn-B">${getIconForQuery(q.optB)}</div>
+                </div>
+            </div>`;
+        lucide.createIcons();
+        const ts = Date.now();
+        document.getElementById('btn-A').onclick = () => record(q.optA);
+        document.getElementById('btn-B').onclick = () => record(q.optB);
+        function record(choice) {
+            session.logs.queries.push({ phase: session.phase, queryId: q.id, choice: choice, rt: Date.now() - ts });
+            callback();
+        }
+    }
+
+    function runRatingSequence(phaseName) {
+        let items = ['M1L', 'M1R']; let idx = 0;
+        function nextRate() {
+            if (idx >= items.length) {
+                if (phaseName === 'RATING_1') startPhase('REVAL_1');
+                else if (phaseName === 'RATING_2') startPhase('REVAL_2'); 
+                else if (phaseName === 'RATING_3') startPhase('DONE'); 
+                return;
+            }
+            showRatingSlide(items[idx], phaseName, () => { idx++; nextRate(); });
+        }
+        nextRate();
+    }
+
+    function showRatingSlide(key, phase, callback) {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        const d = ICONS[key];
+        document.getElementById('overlay-content').innerHTML = `
+            <div class="flex flex-col items-center">
+                <h2 class="text-4xl font-bold mb-12 text-white text-center leading-snug">How do you feel about<br>being in this state?</h2>
+                <div class="w-40 h-40 rounded-3xl flex items-center justify-center mb-16 shadow-2xl border-4 border-slate-700/50" style="background-color: ${d.color}"><i data-lucide="${d.icon}" class="w-20 h-20 text-white"></i></div>
+                <div class="w-full px-12 mb-8">
+                    <input type="range" id="rate-val" min="0" max="100" value="50">
+                    <div class="flex justify-between w-full mt-6 text-sm font-bold text-slate-400 uppercase tracking-widest"><span>Very Bad</span><span>Neutral</span><span>Very Good</span></div>
+                </div>
+                <div class="mt-8"><button id="rate-confirm" class="action-btn">Confirm</button></div>
+            </div>`;
+        lucide.createIcons();
+        const startTs = Date.now();
+        document.getElementById('rate-confirm').onclick = () => {
+            session.logs.ratings.push({ phase: phase, target: key, value: document.getElementById('rate-val').value, rt: Date.now() - startTs });
+            callback();
+        };
+    }
+
+    function showModal(htmlText, btnText, onConfirm) {
+        document.getElementById('hud').classList.add('opacity-0');
+        document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('overlay-content').innerHTML = `
+            ${htmlText}
+            ${btnText ? `<div class="mt-12 text-center"><button id="modal-btn" class="action-btn">${btnText}</button></div>` : ''}
+        `;
+        lucide.createIcons();
+        if(onConfirm && btnText) document.getElementById('modal-btn').onclick = onConfirm;
+    }
+
+    function dismissModal() { document.getElementById('overlay').classList.add('opacity-0', 'pointer-events-none'); }
+
+    // --- FINISH LOGIC ---
+    function finishAll(isForced) {
+        const msg = isForced ? "Game Over - Too many missed trials." : "Task Complete";
+        
+        document.body.innerHTML = `
+            <div class='flex items-center justify-center min-h-screen'>
+                <div class='modal-card'>
+                    <div class="flex justify-center mb-8">
+                        <div class="p-6 bg-green-900/40 border border-green-500/40 rounded-full">
+                            <i data-lucide="check" class="w-16 h-16 text-green-500"></i>
+                        </div>
+                    </div>
+                    <h2 class='text-4xl font-extrabold mb-6 tracking-tight text-white'>${msg}</h2>
+                    <div id='upload-status' class='flex flex-col items-center gap-4'>
+                        <div class='w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin'></div>
+                        <p class='text-slate-500 text-lg'>Saving data to cloud...</p>
+                    </div>
+                </div>
+            </div>`;
+        lucide.createIcons();
+
+        const user = auth.currentUser;
+        
+        if (!user) { 
+             alert("Error: Not signed in. Data cannot be saved."); 
+             return; 
+        }
+
+        const payload = {
+            prolific_id: session.participantId, 
+            timestamp: new Date().toISOString(),
+            status: isForced ? "ABORTED" : "COMPLETED",
+            data: session.logs 
+        };
+
+        db.collection("experiment_results").doc(user.uid).set(payload)
+            .then(() => {
+                document.getElementById('upload-status').innerHTML = `
+                    <p class='text-green-500 text-2xl font-bold mb-4'>Data Saved!</p>
+                    <p class='text-slate-400'>Redirecting to Prolific...</p>`;
+                
+                setTimeout(() => { 
+                    window.location.href = "https://app.prolific.com/submissions/complete?cc=XXXX"; 
+                }, 2000);
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+                document.getElementById('upload-status').innerHTML = `
+                    <p class='text-red-500 text-2xl font-bold'>Save Failed</p>
+                    <p class='text-slate-400'>Error: ${error.message}</p>
+                    <p class='text-xs text-slate-500 mt-4'>Check Firestore Rules for 'subjects' collection.</p>`;
+            });
+    }
+
+    init();
+    </script>
+</body>
+</html>

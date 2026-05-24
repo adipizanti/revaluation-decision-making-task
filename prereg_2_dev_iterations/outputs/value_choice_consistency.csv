@@ -1,0 +1,16 @@
+subject_id,anxiety,anxiety_group,erq_reappraisal,erq_suppression,erq_reapp_group,q1_feather_consistency,q1_triangle_consistency,q2_feather_consistency,q2_triangle_consistency,q1_total_consistency,q2_total_consistency,overall_consistency,q1_feather_rating,q1_triangle_rating,q2_feather_rating,q2_triangle_rating
+65fb70d4e69155a62d58ac90,11,High,30,13,Low,1.0,1.0,1.0,1.0,1.0,1.0,1.0,-15,15,5,15
+612adba08b8235b31539c704,29,High,36,8,High,1.0,1.0,1.0,1.0,1.0,1.0,1.0,5,-5,5,-5
+6960a545231c35c6048d7234,10,Low,29,6,Low,1.0,0.25,1.0,1.0,0.625,1.0,0.8125,5,-5,5,-5
+5ba78b71d60daf0001532d5b,10,Low,36,15,High,0.5,0.5,1.0,0.5,0.5,0.75,0.625,5,-5,5,-5
+67a96562e2b052e6c15ed963,29,High,28,20,Low,0.5,0.5,1.0,1.0,0.5,1.0,0.75,5,-5,5,15
+63fbf0e3b18cc14adc0dbfb6,14,High,28,20,Low,1.0,1.0,1.0,0.75,1.0,0.875,0.9375,5,-5,5,-5
+67ee50bbaa206db46d5e94c2,10,Low,30,17,Low,1.0,1.0,1.0,1.0,1.0,1.0,1.0,5,-5,5,-5
+66e2abbef5fe9e10f5bff804,10,Low,36,9,High,0.5,0.5,1.0,0.75,0.5,0.875,0.6875,-5,-5,-5,5
+66d1fdd400acfdbc181f41e0,10,Low,31,14,High,0.5,0.75,0.5,1.0,0.625,0.75,0.6875,-20,20,-20,0
+666f76b68b89442817be678a,30,High,30,8,Low,0.5,1.0,0.5,1.0,0.75,0.75,0.75,-20,20,-20,20
+5e7fa0e918b10804bb87eb63,17,High,36,24,High,1.0,1.0,1.0,1.0,1.0,1.0,1.0,25,15,5,-20
+6065f9d75bd3321f0bafa750,17,High,24,26,Low,1.0,1.0,0.75,1.0,1.0,0.875,0.9375,-20,20,-20,10
+5d7fd2a5987f70001602d95b,10,Low,42,16,High,1.0,1.0,1.0,1.0,1.0,1.0,1.0,5,-5,5,-5
+56d1f7f67bbc32000589a588,14,High,33,19,High,1.0,1.0,1.0,1.0,1.0,1.0,1.0,-15,15,5,15
+667d08e12ac1bcbdd829a936,10,Low,36,10,High,0.5,0.5,1.0,0.5,0.5,0.75,0.625,5,-5,-5,-5
