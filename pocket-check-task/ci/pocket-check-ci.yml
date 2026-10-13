@@ -1,0 +1,24 @@
+name: pocket-check-ci
+on:
+  pull_request:
+    paths: ['pocket-check-task/**', '.github/workflows/pocket-check-ci.yml']
+  push:
+    branches: [main]
+    paths: ['pocket-check-task/**']
+defaults:
+  run:
+    working-directory: pocket-check-task
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocket-check-index-html
+          path: pocket-check-task/dist/index.html

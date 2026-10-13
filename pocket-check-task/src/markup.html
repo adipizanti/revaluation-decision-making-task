@@ -1,0 +1,82 @@
+
+<!-- ============ INTRO ============ -->
+<section id="intro" class="screen">
+  <div>
+    <h1>Pocket Check</h1>
+    <p class="lede">Learn a small map, collect points, then choose again after the values change. Your mouse path is recorded on every choice.</p>
+    <div class="fields">
+      <label for="pid">Participant ID<input id="pid" type="text" autocomplete="off" placeholder="optional"></label>
+      <label for="grp">Group<input id="grp" type="text" autocomplete="off" placeholder="optional"></label>
+    </div>
+    <div class="btns"><button class="btn" id="startBtn">Start</button><button class="btn ghost" id="toRv">Researcher view</button></div>
+    <p id="mouseWarn" hidden>This task needs a mouse or trackpad. A touch screen will not record usable paths. You can still start to look around.</p>
+    <div class="steps"><span><i></i>Move to the ring and wait</span><span><i class="c2"></i>Choices appear</span><span><i class="c3"></i>Click one</span></div>
+  </div>
+  <div class="treeart" id="treeArt" aria-hidden="true"></div>
+</section>
+
+<!-- ============ TASK ============ -->
+<section id="taskScreen" class="screen" hidden>
+  <div id="stageWrap">
+    <div id="stage">
+      <div id="hud" class="live"><span id="hudPhase"></span><span id="hudScore"></span><span id="hudBar"><i id="hudFill"></i></span></div>
+      <div id="ask" class="at live"></div>
+      <div id="tile" class="at live"></div>
+      <div id="reward" class="at live"></div>
+      <div id="tgtL" class="at tgt live"></div>
+      <div id="tgtR" class="at tgt live"></div>
+      <div id="park" class="at live"><svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="44"/><circle class="fg" cx="50" cy="50" r="44"/></svg><span class="dot"></span></div>
+      <div id="cap" class="at live"></div>
+      <div id="overlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END ============ -->
+<section id="endScreen" class="screen" hidden>
+  <h2>Done</h2>
+  <p class="muted" id="endSub">Your run is saved in this browser.</p>
+  <div class="kv" id="endKv"></div>
+  <div class="btns">
+    <button class="btn" id="dlJson">Save data (JSON)</button>
+    <button class="btn ghost" id="dlCsv">Save metrics (CSV)</button>
+    <button class="btn ghost" id="endToRv">Open in researcher view</button>
+    <button class="btn ghost" id="again">Run again</button>
+  </div>
+  <p class="note" id="endNote"></p>
+</section>
+
+<!-- ============ RESEARCHER ============ -->
+<section id="rv" class="screen" hidden>
+  <div class="rvtop"><h2>Researcher view <span id="demoTag" class="demo" hidden>synthetic demo data</span></h2><button class="linkbtn" id="rvBack">Back to task</button></div>
+  <div class="rvgrid">
+    <div class="side">
+      <div class="box">
+        <h3>Runs</h3>
+        <div class="row">
+          <button class="btn sm" id="addFiles">Add JSON files</button>
+          <button class="btn sm ghost" id="addSaved">This browser</button>
+          <button class="btn sm ghost" id="addDemo">Demo data</button>
+          <button class="btn sm ghost" id="clearRuns">Clear</button>
+        </div>
+        <input id="fileIn" type="file" accept=".json,application/json" multiple hidden>
+        <div id="runList"></div>
+      </div>
+      <div class="box">
+        <h3>View</h3>
+        <div class="seg" id="lvl"><button data-l="trial">Trial</button><button data-l="part" class="on">Person</button><button data-l="group">Group</button><button data-l="all">Sample</button></div>
+        <label id="selPartWrap">Person<select id="selPart"></select></label>
+        <label id="selGroupWrap">Group<select id="selGroup"></select></label>
+        <label id="selTrialWrap">Decision<select id="selTrial"></select></label>
+      </div>
+      <div class="box" id="filtBox">
+        <h3>Filter and split</h3>
+        <label>Phase<select id="fPhase"><option value="choice">Choices after revaluation</option><option value="all">All phases</option><option value="map">Map learning</option><option value="points">Point learning</option><option value="quiz">Map quiz</option></select></label>
+        <label>Outcome<select id="fOut"><option value="all">All</option><option value="right">Model-based answer</option><option value="wrong">Other answer</option></select></label>
+        <label>Difficulty (distance from indifference)<select id="fDiff"><option value="all">All</option><option value="hard">Hard (3, 6)</option><option value="easy">Easy (12, 24)</option></select></label>
+        <label>Split panels by<select id="fSplit"><option value="none">None</option><option value="group">Group</option><option value="out">Answer</option><option value="diff">Difficulty</option><option value="phase">Phase</option><option value="reval">Revaluation</option></select></label>
+      </div>
+    </div>
+    <div id="rvMain"></div>
+  </div>
+</section>
