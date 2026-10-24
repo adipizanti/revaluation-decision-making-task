@@ -1,0 +1,21 @@
+# Large / regenerable analysis outputs (kept on the NAS, not in git)
+*.pkl
+*.log
+cbm_output*/
+
+# Python / Jupyter / Node
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+node_modules/
+
+# Privacy: never commit participant-identifying files
+PRIVATE_*
+
+# Local housekeeping
+_to_delete/
+_backups/
+_tmp*/
+*.bat
+.DS_Store
+Thumbs.db
