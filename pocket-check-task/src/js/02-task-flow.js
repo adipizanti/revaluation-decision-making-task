@@ -24,7 +24,7 @@ function newSession() {
 
 /* ---------- 1. map learning ---------- */
 async function mapBlocks(blocks, label) {
-  const paths = [['L', 'L'], ['L', 'R'], ['R', 'L'], ['R', 'R']], total = blocks * 4; let k = 0;
+  const paths = [['L', 'L'], ['L', 'R'], ['R', 'L'], ['R', 'R']].slice(0, CFG.MAP_PATHS), total = blocks * paths.length; let k = 0;
   for (let b = 0; b < blocks; b++) for (const [s0, s1] of shuffle(paths, S.rng)) {
     k++; setHud(label, k, total); const trial = ++S.mapTrial;
     let d = await decide({ ...ACTSPEC, phase: 'map', trial, step: 0, kind: 'action', state: 'S', forced: s0,
@@ -41,7 +41,7 @@ async function quiz(round) {
   for (const s of ['L', 'R']) items.push({ ask: `${s === 'L' ? 'Left' : 'Right'} from the circle leads to…`, state: 'S', ans: ch.S[s], other: ch.S[s] === 'M1L' ? 'M1R' : 'M1L' });
   for (const m of ['M1L', 'M1R']) { const o = m === 'M1L' ? 'M1R' : 'M1L'; for (const s of ['L', 'R']) items.push({ ask: `${ICON[m].n} can lead to…`, state: m, ans: ch[m][s], other: ch[o][S.rng() < .5 ? 'L' : 'R'] }); }
   let correct = 0; setHud('Check the map', 0, 0);
-  const order = shuffle(items, S.rng);
+  const order = shuffle(items, S.rng).slice(0, CFG.QUIZ_N);
   for (let i = 0; i < order.length; i++) {
     const it = order[i], ansSide = S.rng() < .5 ? 'L' : 'R';
     const card = id => ({ id, html: `<div class="card">${tileHTML(id, 96)}<span class="lbl">${ICON[id].n}</span></div>` });

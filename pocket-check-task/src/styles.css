@@ -131,7 +131,7 @@ input[type=range].untouched::-moz-range-thumb{background:var(--panel2);border:3p
 .box .row{display:flex;gap:8px;flex-wrap:wrap}
 .box label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);margin-top:8px}
 .box select,.box input[type=text]{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--ink);font-size:14px;width:100%}
-.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
 .seg button{background:transparent;border:0;border-right:1px solid var(--line2);padding:8px 2px;font-size:13px;cursor:pointer;color:var(--muted)}
 .seg button:last-child{border-right:0}
 .seg button.on{background:var(--ink);color:#0b0e13;font-weight:600}
@@ -172,3 +172,13 @@ input[type=range].untouched::-moz-range-thumb{background:var(--panel2);border:3p
   .side{position:static}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.dtbl{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:340px;margin-bottom:6px}
+.dtbl table{border-collapse:collapse;font-family:var(--f-num);font-size:12px;width:100%}
+.dtbl th,.dtbl td{padding:6px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+.dtbl th{position:sticky;top:0;background:var(--panel2);color:var(--muted);font-weight:500}
+.dtbl td:first-child,.dtbl th:first-child{text-align:left}
+.dbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.tbl td.mn{white-space:normal;max-width:520px}
+.tbl td.mn span{display:block}
+.tbl td.mn small{display:block;color:var(--muted);font-family:var(--f-ui);font-size:12px;line-height:1.35;margin-top:2px}

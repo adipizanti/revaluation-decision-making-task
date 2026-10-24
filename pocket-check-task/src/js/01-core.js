@@ -12,7 +12,7 @@ const CFG = {
   TGT: { L: { x: 190, y: 175 }, R: { x: 810, y: 175 } },
   ACT_HALF: 75, CARD_HW: 96, CARD_HH: 104,
   TILE: { x: 500, y: 400 },
-  SL_BLOCKS: 4, SL_REMEDIAL_BLOCKS: 2, QUIZ_PASS: 5,
+  SL_BLOCKS: 4, SL_REMEDIAL_BLOCKS: 2, QUIZ_PASS: 5, MAP_PATHS: 4, QUIZ_N: 6,
   VL_FORCED: 6, VL_FREE: 10, VL_REWARD: { M1L: 5, M1R: -5 },
   QUERY_D: [3, 6, 12, 24],
   EV: { 1: { M1L: -20, M1R: 20 }, 2: { M1L: -15, M1R: 15 } },

@@ -61,6 +61,8 @@ if (hasAdd) { await hasAdd.click(); await page.waitForTimeout(400);
     await page.click(`#lvl button[data-l=${l}]`); if (f) await page.selectOption('#fSplit', f); await page.waitForTimeout(250);
   }
   check('researcher view renders at 3 levels', true);
+  await page.click('#lvl button[data-l=data]'); await page.waitForTimeout(250);
+  check('data view shows participant + trial tables', await page.evaluate(() => document.querySelectorAll('#rvMain .dtbl').length === 2 && !!document.getElementById('dlP')));
 }
 check('no page errors', errs.length === 0, errs.slice(0, 3).join(' | '));
 await browser.close();

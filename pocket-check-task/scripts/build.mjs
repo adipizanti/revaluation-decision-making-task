@@ -8,14 +8,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const rd = p => readFileSync(join(root, p), 'utf8');
 const pkg = JSON.parse(rd('package.json'));
 
-const js = readdirSync(join(root, 'src/js')).filter(f => f.endsWith('.js')).sort()
-  .map(f => rd('src/js/' + f)).join('\n')
-  .replaceAll('__TASK_VERSION__', pkg.version);
+const demo = process.argv.includes('--demo');
+const js0 = readdirSync(join(root, 'src/js')).filter(f => f.endsWith('.js')).sort()
+  .map(f => rd('src/js/' + f)).join('\n');
+const js = (demo ? js0 + '\n' + rd('src/demo/demo.js') : js0).replaceAll('__TASK_VERSION__', pkg.version + (demo ? '-demo' : ''));
 
 const html = [
   '<!doctype html><html lang="en"><head><meta charset="utf-8">',
   '<meta name="viewport" content="width=device-width,initial-scale=1">',
-  `<meta name="task-version" content="${pkg.version}">`,
+  `<meta name="task-version" content="${pkg.version}${demo ? '-demo' : ''}">`,
   rd('src/head.html').trimEnd(),
   '<style>', rd('src/styles.css').trimEnd(), '</style></head><body>',
   rd('src/markup.html').trimEnd(),
@@ -23,5 +24,6 @@ const html = [
 ].join('\n');
 
 mkdirSync(join(root, 'dist'), { recursive: true });
-writeFileSync(join(root, 'dist/index.html'), html);
-console.log(`built dist/index.html  v${pkg.version}  ${(html.length / 1024).toFixed(1)} KB`);
+const out = demo ? 'dist/demo.html' : 'dist/index.html';
+writeFileSync(join(root, out), html);
+console.log(`built ${out}  v${pkg.version}  ${(html.length / 1024).toFixed(1)} KB`);

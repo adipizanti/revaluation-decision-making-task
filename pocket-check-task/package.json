@@ -1,11 +1,12 @@
 {
   "name": "pocket-check-task",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Pocket Check Task - proof of concept: two-step revaluation task with mouse-trajectory capture to measure checking.",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:demo": "node scripts/build.mjs --demo",
     "test": "npm run build && node tests/smoke.mjs",
     "serve": "npm run build && npx --yes http-server dist -p 8080 -c-1"
   },

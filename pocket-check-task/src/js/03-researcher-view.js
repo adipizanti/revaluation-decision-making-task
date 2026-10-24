@@ -111,6 +111,22 @@ const MET = [
   ['Max pull to other side (px)', d => d.m.mad, 0], ['Area toward other side (px²)', d => d.m.auc, 0], ['Path straightness (1 = straight)', d => d.m.straight, 2],
   ['Peak speed (px/s)', d => d.m.velPeak, 0], ['Touched other option (%)', d => d.m.visitedOther ? 100 : 0, 0, true], ['Matches new values (%)', d => d.correct == null ? null : d.correct ? 100 : 0, 0, true]
 ];
+const MET_INFO = {
+  'Choice time (ms)': 'From the moment the options appear until the click. The overall decision time.',
+  'Time to first move (ms)': 'From the options appearing until the mouse first moves more than 10 px. Long = a pause before acting.',
+  'Move to heading (ms)': 'From the first move until the mouse has travelled 70 px sideways toward the option that was finally chosen. How long it takes to commit to a direction.',
+  'Heading to on-target (ms)': 'From committing to a direction until the cursor enters the chosen option. The approach.',
+  'Time on target before click (ms)': 'Time the cursor sat on the chosen option before the click. Long = hesitating after already arriving.',
+  'Hover time (ms)': 'Total time the cursor stood nearly still (within 4 px for at least 150 ms) between first move and click, anywhere on screen.',
+  'Hovers': 'Number of separate pauses of at least 150 ms. Counts the stops, not how long they lasted.',
+  'Direction reversals': 'Times the cursor changed its left/right direction by more than 25 px. Wavering between the two options.',
+  'Max pull to other side (px)': 'Farthest the path bent toward the option not chosen, measured from the straight line start to click.',
+  'Area toward other side (px²)': 'How much, and for how long, the path leaned toward the option not chosen. Averages the pull over the whole movement.',
+  'Path straightness (1 = straight)': 'Length of the path divided by the straight-line distance. 1.00 is perfectly straight; higher means a more winding path.',
+  'Peak speed (px/s)': 'Fastest the cursor moved at any point. A rough motor-speed baseline for each person.',
+  'Touched other option (%)': 'Share of decisions where the cursor entered the option not chosen before the click.',
+  'Matches new values (%)': 'Share of choices that agree with the best option after the revaluation (the model-based answer). Reads as accuracy.'
+};
 function aggregate(items, fn, pct) {
   const by = new Map(); for (const it of items) { const v = fn(it.d); if (v == null || !isFinite(v)) continue; if (!by.has(it.run.id)) by.set(it.run.id, []); by.get(it.run.id).push(v); }
   const per = [...by.values()].map(a => pct ? mean(a) : median(a)); return mean(per);
@@ -133,7 +149,8 @@ function renderRv() {
   $('#selGroup').innerHTML = groups.map(g => `<option>${esc(g)}</option>`).join(''); $('#selGroup').value = RV.group;
   $$('#lvl button').forEach(b => b.classList.toggle('on', b.dataset.l === RV.level));
   const L = RV.level;
-  $('#selPartWrap').hidden = !(L === 'trial' || L === 'part'); $('#selGroupWrap').hidden = L !== 'group'; $('#selTrialWrap').hidden = L !== 'trial'; $('#filtBox').hidden = L === 'trial';
+  $('#selPartWrap').hidden = !(L === 'trial' || L === 'part'); $('#selGroupWrap').hidden = L !== 'group'; $('#selTrialWrap').hidden = L !== 'trial'; $('#filtBox').hidden = L === 'trial' || L === 'data';
+  if (L === 'data') return renderData();
   if (L === 'trial') return renderTrial(runs.find(r => r.id === RV.part));
   let pool = runs;
   if (L === 'part') pool = runs.filter(r => r.id === RV.part);
@@ -147,8 +164,8 @@ function renderRv() {
   const geom = (items[0] && items[0].d.hit) || { L: { cx: 190, cy: 175, hw: 96, hh: 104 }, R: { cx: 810, cy: 175, hw: 96, hh: 104 } };
   main.innerHTML = `<div class="panels">${panels.map((p, i) => `<div class="pnl"><div class="ph"><b>${esc(p.label)}</b><span class="muted num" style="font-size:12px">${p.its.length} decisions · ${new Set(p.its.map(x => x.run.id)).size} people</span></div><canvas id="hc${i}"></canvas></div>`).join('')}</div>
     <div class="legend"><span>less time</span><i></i><span>more time (up to ${max.toFixed(2)} s per decision in one cell). Paths are flipped so the answer is on the right.</span></div>
-    <div class="tbl"><table><thead><tr><th>Measure</th>${panels.map(p => `<th>${esc(p.label)}</th>`).join('')}</tr></thead><tbody>${MET.map(([name, fn, dec, pct]) => `<tr><td>${name}</td>${panels.map(p => `<td>${fmt(aggregate(p.its, fn, pct), dec)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-    <p class="muted" style="font-size:12px;margin-top:8px">Table cells are each person's median, averaged across people (percentages are means).</p>`;
+    <div class="tbl"><table><thead><tr><th>Measure</th>${panels.map(p => `<th>${esc(p.label)}</th>`).join('')}</tr></thead><tbody>${MET.map(([name, fn, dec, pct]) => `<tr><td class="mn"><span>${name}</span><small>${MET_INFO[name] || ''}</small></td>${panels.map(p => `<td>${fmt(aggregate(p.its, fn, pct), dec)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <p class="muted" style="font-size:12px;margin-top:8px">Table cells are each person's median, averaged across people (percentages are means). Time 0 is when the options appear.</p>`;
   panels.forEach((p, i) => drawHeat($('#hc' + i), p.g, max, geom));
 }
 
@@ -223,6 +240,38 @@ function demoRuns() {
     out.push({ schema: 'pocketcheck/1', demo: true, id: 'demo-' + String(p + 1).padStart(2, '0'), group: high ? 'High worry' : 'Low worry', decisions, quiz: [], ratings: [], reveals: [], score: 0 });
   }
   return out;
+}
+
+
+/* ---------- data output: participant table, trial table, downloads ---------- */
+const PCOLS = [['id', 'id', 0], ['group', 'group', 0], ['n_choices', 'choices', 0], ['pct_mb', '% model-based', 0], ['rt_med', 'choice time (ms)', 0], ['init_med', 'first move (ms)', 0],
+  ['approach_med', 'heading to target (ms)', 0], ['dwell_med', 'on target before click (ms)', 0], ['hovers_mean', 'hovers', 2], ['flips_mean', 'reversals', 2], ['mad_mean', 'pull to other (px)', 0], ['touched_other_pct', 'touched other (%)', 0]];
+function participantRows(runs) {
+  return runs.map(r => {
+    const ch = r.decisions.filter(d => d.phase === 'choice' && d.m), g = f => ch.map(f).filter(v => v != null && isFinite(v));
+    const cor = ch.filter(d => d.correct != null);
+    return { id: r.id, group: r.group || '', n_choices: ch.length, pct_mb: cor.length ? 100 * cor.filter(d => d.correct).length / cor.length : null,
+      rt_med: median(g(d => d.rt)), init_med: median(g(d => d.m.init)), approach_med: median(g(d => d.m.sApproach)), dwell_med: median(g(d => d.m.dwell)),
+      hovers_mean: mean(g(d => d.m.hovers)), flips_mean: mean(g(d => d.m.flips)), mad_mean: mean(g(d => d.m.mad)), touched_other_pct: ch.length ? 100 * mean(g(d => d.m.visitedOther ? 1 : 0)) : null, demo: !!r.demo };
+  });
+}
+const toCsv = (cols, rows) => [cols.join(','), ...rows.map(o => cols.map(c => { let v = o[c]; if (v == null || (typeof v === 'number' && !isFinite(v))) return ''; if (typeof v === 'number') v = Math.round(v * 1000) / 1000; v = String(v); return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; }).join(','))].join('\n');
+const TCOLS = [['id', 'id'], ['group', 'group'], ['phase', 'phase'], ['trial', 'trial'], ['state', 'state'], ['dist', 'distance'], ['chosen', 'chose'], ['correct', 'MB answer'], ['rt', 'choice time'], ['init', 'first move'],
+  ['sApproach', 'to target'], ['dwell', 'on target'], ['hovers', 'hovers'], ['flips', 'reversals'], ['mad', 'pull to other']];
+function renderData() {
+  const runs = RV.runs, main = $('#rvMain'), prow = participantRows(runs);
+  const trows = []; for (const r of runs) for (const d of r.decisions) if (d.m) trows.push({ id: r.id, group: r.group || '', ...d, ...d.m, ...d.meta });
+  const show = trows.filter(t => t.phase === 'choice').slice(0, 60);
+  const cell = (v, dec) => v == null ? '–' : typeof v === 'boolean' ? (v ? 1 : 0) : typeof v === 'number' ? (dec != null ? v.toFixed(dec) : Math.round(v * 10) / 10) : esc(String(v));
+  main.innerHTML = `<h3 style="margin:0 0 4px">Participant table <span class="muted" style="font-weight:400;font-size:13px">one row per person, choices after revaluation</span></h3>
+    <div class="dtbl"><table><thead><tr>${PCOLS.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${prow.map(o => `<tr>${PCOLS.map(c => `<td>${cell(o[c[0]], c[2])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <h3 style="margin:18px 0 4px">Trial table <span class="muted" style="font-weight:400;font-size:13px">first ${show.length} of ${trows.filter(t => t.phase === 'choice').length} choice decisions (all phases are in the download)</span></h3>
+    <div class="dtbl"><table><thead><tr>${TCOLS.map(c => `<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${show.map(o => `<tr>${TCOLS.map(c => `<td>${cell(o[c[0]])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="dbar"><button class="btn sm" id="dlP">Download participant table (CSV)</button><button class="btn sm ghost" id="dlT">Download trial table (CSV)</button><button class="btn sm ghost" id="dlJ">Download raw runs with mouse paths (JSON)</button></div>
+    <p class="muted" style="font-size:12px">${runs.some(r => r.demo) ? 'Rows with ids starting "demo-" are synthetic. ' : ''}The JSON keeps every x, y, time sample; the CSVs hold the derived measures. Column meanings are in docs/DATA_FORMAT.md.</p>`;
+  $('#dlP').onclick = () => saveFile('pocketcheck_participants.csv', toCsv(PCOLS.map(c => c[0]).concat('demo'), prow), 'text/csv');
+  $('#dlT').onclick = () => saveFile('pocketcheck_trials.csv', runToCsv(runs), 'text/csv');
+  $('#dlJ').onclick = () => saveFile('pocketcheck_runs.json', JSON.stringify(runs), 'application/json');
 }
 
 /* ---------- boot ---------- */
